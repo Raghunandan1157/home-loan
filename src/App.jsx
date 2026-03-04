@@ -397,8 +397,8 @@ const DataEntryPage = ({ onDone, onBack }) => {
       setForm(p => ({ 
         ...p, 
         name: "Rajesh Kumar", 
-        permanentAddress: "123, 4th Cross, JP Nagar, Bengaluru 560078",
-        communicationAddress: "123, 4th Cross, JP Nagar, Bengaluru 560078"
+        permanentAddress: "123, 4th Cross, JP Nagar, Bengaluru 560078"
+        // communicationAddress is left empty - only filled when user clicks "Same as Permanent" button
       }));
     }
   };
@@ -454,8 +454,8 @@ const DataEntryPage = ({ onDone, onBack }) => {
       <Card>
         <h2 style={{ fontFamily: T.font, fontWeight: 600, fontSize: 20, color: T.text, margin: "0 0 6px" }}>Personal Details</h2>
         <p style={{ fontSize: 13, color: T.textMuted, margin: "0 0 22px" }}>Enter your contact & work details</p>
-        <Input label="Full Name" placeholder="Auto-extracted from ID" value={form.name} onChange={v => set("name", v)} required icon="👤" />
-        <Input label="Permanent Address" placeholder="Full residential address" value={form.permanentAddress} onChange={v => set("permanentAddress", v)} required icon="📍" />
+        <Input label="Full Name" placeholder="Auto-extracted from ID" value={form.name} onChange={v => set("name", v)} required icon="👤" disabled={aadhaarExtracted} />
+        <Input label="Permanent Address" placeholder="Full residential address" value={form.permanentAddress} onChange={v => set("permanentAddress", v)} required icon="📍" disabled={aadhaarExtracted} />
         <div style={{ display: "flex", gap: 8, alignItems: "flex-end" }}>
           <div style={{ flex: 1 }}>
             <Input label="Communication Address" placeholder="Full communication address" value={form.communicationAddress} onChange={v => set("communicationAddress", v)} required icon="📍" />
