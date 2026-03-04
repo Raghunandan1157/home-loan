@@ -159,16 +159,16 @@ const LoginPage = ({ onSelect }) => {
           <span style={linkS}>About</span>
           <span style={linkS}>Services</span>
           <span style={linkS}>How It Works</span>
-          {/* Referral Partner Dropdown */}
+          {/* Empanel Dropdown */}
           <div ref={dropRef} style={{ position:"relative" }}>
             <button onClick={() => setDropOpen(!dropOpen)} style={{ ...linkS, display:"flex",alignItems:"center",gap:4 }}>
-              Referral Partner <span style={{ fontSize:10,transition:"transform .2s",transform:dropOpen?"rotate(180deg)":"none" }}>▾</span>
+              Empanel <span style={{ fontSize:10,transition:"transform .2s",transform:dropOpen?"rotate(180deg)":"none" }}>▾</span>
             </button>
             {dropOpen && (
               <div style={{ position:"absolute",top:"calc(100% + 8px)",right:0,background:"#fff",borderRadius:12,boxShadow:"0 20px 40px -8px rgba(0,0,0,.15)",border:"1px solid #e2e8f0",minWidth:210,padding:6,zIndex:101,animation:"fadeUp .2s ease-out" }}>
                 <button onClick={() => { setDropOpen(false); openRole("referral"); }} style={{ display:"flex",alignItems:"center",gap:10,width:"100%",padding:"10px 14px",border:"none",background:"transparent",borderRadius:8,cursor:"pointer",textAlign:"left",transition:"background .15s",fontFamily:"inherit" }} onMouseEnter={e=>e.currentTarget.style.background="#f0fdfa"} onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
                   <span style={{ fontSize:16 }}>⚡</span>
-                  <span style={{ fontSize:14,fontWeight:500,color:"#1e293b" }}>Referral Partner</span>
+                  <span style={{ fontSize:14,fontWeight:500,color:"#1e293b" }}>Empanel</span>
                 </button>
                 <button onClick={() => { setDropOpen(false); setModal("choose"); }} style={{ display:"flex",alignItems:"center",gap:10,width:"100%",padding:"10px 14px",border:"none",background:"transparent",borderRadius:8,cursor:"pointer",textAlign:"left",transition:"background .15s",fontFamily:"inherit" }} onMouseEnter={e=>e.currentTarget.style.background="#f0fdfa"} onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
                   <span style={{ fontSize:16 }}>🔐</span>
@@ -229,7 +229,7 @@ const LoginPage = ({ onSelect }) => {
                 <h2 style={{ textAlign:"center",fontSize:22,fontWeight:700,color:"#1e293b",marginBottom:4 }}>Login</h2>
                 <p style={{ textAlign:"center",fontSize:14,color:"#94a3b8",marginBottom:24 }}>Select your role to continue</p>
                 <div style={{ display:"flex",flexDirection:"column",gap:10 }}>
-                  {[["referral","⚡","Referral Partner","Field ops & client connections"],["ops","📊","Operational Manager","Reports & analytics"]].map(([id,ic,nm,desc])=>(
+                  {[["referral","⚡","Empanel","Field ops & client connections"],["ops","📊","Operational Manager","Reports & analytics"]].map(([id,ic,nm,desc])=>(
                     <button key={id} onClick={() => openRole(id)} style={{ display:"flex",alignItems:"center",gap:14,padding:"16px 18px",background:"#f0fdfa",border:"2px solid transparent",borderRadius:12,cursor:"pointer",textAlign:"left",transition:"all .25s",fontFamily:"inherit" }} onMouseEnter={e=>{e.currentTarget.style.borderColor="#0d9488";e.currentTarget.style.background="#fff";e.currentTarget.style.boxShadow="0 4px 12px rgba(0,0,0,.08)"}} onMouseLeave={e=>{e.currentTarget.style.borderColor="transparent";e.currentTarget.style.background="#f0fdfa";e.currentTarget.style.boxShadow="none"}}>
                       <div style={{ width:44,height:44,borderRadius:10,background:"#fff",boxShadow:"0 1px 3px rgba(0,0,0,.08)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:20,flexShrink:0 }}>{ic}</div>
                       <div><div style={{ fontWeight:600,fontSize:15,color:"#1e293b" }}>{nm}</div><div style={{ fontSize:12,color:"#94a3b8",marginTop:2 }}>{desc}</div></div>
@@ -241,7 +241,7 @@ const LoginPage = ({ onSelect }) => {
               <>
                 <button onClick={() => setModal("choose")} style={{ background:"none",border:"none",color:"#94a3b8",fontSize:14,fontWeight:500,cursor:"pointer",marginBottom:14,padding:0,fontFamily:"inherit" }}>← Back</button>
                 <div style={{ textAlign:"center",fontSize:36,marginBottom:10 }}>{modal === "referral" ? "⚡" : "📊"}</div>
-                <h2 style={{ textAlign:"center",fontSize:22,fontWeight:700,color:"#1e293b",marginBottom:4 }}>{modal === "referral" ? "Referral Partner Login" : "Operational Manager Login"}</h2>
+                <h2 style={{ textAlign:"center",fontSize:22,fontWeight:700,color:"#1e293b",marginBottom:4 }}>{modal === "referral" ? "Empanel Login" : "Operational Manager Login"}</h2>
                 <p style={{ textAlign:"center",fontSize:14,color:"#94a3b8",marginBottom:24 }}>Enter your credentials to sign in</p>
                 <form onSubmit={handleLogin}>
                   <div style={{ marginBottom:14 }}>
@@ -317,7 +317,7 @@ const GoogleAuthPage = ({ onDone, onBack, role }) => {
       <Brand small />
       <Card>
         <h2 style={{ fontFamily: T.font, fontWeight: 600, fontSize: 20, color: T.text, margin: "0 0 6px", textAlign: "center" }}>Sign in with Google</h2>
-        <p style={{ fontSize: 13, color: T.textMuted, textAlign: "center", margin: "0 0 24px", lineHeight: 1.6 }}>Verify your identity to continue as {role === "ops" ? "Operations Manager" : "Referral Partner"}</p>
+        <p style={{ fontSize: 13, color: T.textMuted, textAlign: "center", margin: "0 0 24px", lineHeight: 1.6 }}>Verify your identity to continue as {role === "ops" ? "Operations Manager" : "Empanel"}</p>
         {done && user ? (
           <div style={{ textAlign: "center", padding: "16px 0" }}>
             {user.picture && <img src={user.picture} alt="" style={{ width: 52, height: 52, borderRadius: "50%", border: "2px solid " + T.green, marginBottom: 10 }} />}
@@ -481,10 +481,10 @@ const EAgreementPage = ({ onDone, onBack }) => {
   const [agreed, setAgreed] = useState(false);
   const scrollRef = useRef(null);
   const handleScroll = useCallback(() => { const el = scrollRef.current; if (el && (el.scrollTop + el.clientHeight >= el.scrollHeight - 20)) setScrolled(true); }, []);
-  const lines = [
-    "E-AGREEMENT — NAVACHETANA LIVELIHOODS (REFERRAL PARTNER)", "",
-    "This Referral Partner Agreement ('Agreement') is entered into between Navachetana Livelihoods Pvt. Ltd. ('Company') and the undersigned individual ('Referral Partner').", "",
-    "1. SCOPE OF ENGAGEMENT", "The Referral Partner shall act as an independent facilitator, assisting in identifying potential borrowers, collecting documentation, and facilitating loan applications within the assigned territory.", "",
+  const AGREEMENT_TXT = [
+      "E-AGREEMENT — NAVACHETANA LIVELIHOODS (EMPANEL)", "",
+      "This Empanel Agreement ('Agreement') is entered into between Navachetana Livelihoods Pvt. Ltd. ('Company') and the undersigned individual ('Empanel').", "",
+      "1. SCOPE OF ENGAGEMENT", "The Empanel shall act as an independent facilitator, assisting in identifying potential borrowers, collecting documentation, and facilitating loan applications within the assigned territory.", "",
     "2. RESPONSIBILITIES", "2.1 Comply with all applicable RBI guidelines and NBFC-MFI regulations.", "2.2 Conduct due diligence on prospective borrowers and verify documentation.", "2.3 All client information is confidential and proprietary to the Company.", "",
     "3. COMPENSATION", "3.1 Commission as per the prevailing rate card.", "3.2 Payments processed within 15 business days of loan disbursement.", "3.3 Disputes resolved through the Company's grievance mechanism.", "",
     "4. CODE OF CONDUCT", "4.1 No coercive recovery practices.", "4.2 Maintain transparency with borrowers regarding terms.", "4.3 No direct money collection from borrowers.", "",
@@ -563,12 +563,12 @@ const ConnectorStatusPage = ({ appData, onBack }) => (
             <span style={{ fontSize: 38 }}>🎉</span>
           </div>
           <h2 style={{ fontFamily: T.font, fontWeight: 700, fontSize: 24, color: T.text, margin: "0 0 8px" }}>You're Approved!</h2>
-          <p style={{ fontSize: 14, color: T.textMuted, margin: "0 0 24px" }}>Your referral partner account has been activated</p>
+          <p style={{ fontSize: 14, color: T.textMuted, margin: "0 0 24px" }}>Your empanel account has been activated</p>
           <Card style={{ textAlign: "left", marginBottom: 16 }}>
             <p style={{ fontSize: 11, fontWeight: 600, color: T.green, letterSpacing: ".08em", textTransform: "uppercase", margin: "0 0 14px", fontFamily: T.font }}>Your Login Credentials</p>
             <div style={{ padding: "14px", background: "rgba(0,0,0,.25)", borderRadius: 10, border: `1px solid ${T.cardBorder}`, marginBottom: 14 }}>
               <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 10 }}>
-                <span style={{ fontSize: 12, color: T.textMuted }}>Referral Partner ID</span>
+                <span style={{ fontSize: 12, color: T.textMuted }}>Empanel ID</span>
                 <span style={{ fontSize: 14, fontWeight: 600, fontFamily: "monospace", color: T.accent }}>{appData.connectorId || appData.id}</span>
               </div>
               <div style={{ height: 1, background: T.cardBorder, margin: "0 0 10px" }} />
@@ -621,7 +621,7 @@ const ConnectorStatusPage = ({ appData, onBack }) => (
           </Card>
         </>
       )}
-      <p style={{ marginTop: 28, fontSize: 11, color: T.textDim }}>Navachetana Livelihoods · Referral Partner Onboarding</p>
+      <p style={{ marginTop: 28, fontSize: 11, color: T.textDim }}>Navachetana Livelihoods · Empanel Onboarding</p>
     </div>
   </PageShell>
 );
@@ -658,13 +658,13 @@ const ConnectorLandingPage = ({ existingApp, onNewApp, onViewApp, onBack }) => {
       <div onClick={onNewApp} onMouseEnter={() => setHov("new")} onMouseLeave={() => setHov(null)} style={{ padding: "20px", background: hov === "new" ? `linear-gradient(160deg,${T.green}10,transparent)` : T.card, border: `1.5px dashed ${hov === "new" ? T.green + "60" : T.cardBorder}`, borderRadius: 14, cursor: "pointer", transition: "all .35s", textAlign: "center", transform: hov === "new" ? "translateY(-2px)" : "none" }}>
         <div style={{ fontSize: 28, marginBottom: 8 }}>➕</div>
         <div style={{ fontFamily: T.font, fontWeight: 600, fontSize: 15, color: hov === "new" ? T.text : "#c9d1d9" }}>Empanel</div>
-        <div style={{ fontSize: 12, color: T.textDim, marginTop: 4 }}>Begin a fresh referral partner empanelment</div>
+        <div style={{ fontSize: 12, color: T.textDim, marginTop: 4 }}>Begin a fresh empanelment</div>
       </div>
     </PageShell>
   );
 };
 
-// ─── REFERRAL PARTNER LOGIN ───
+// ─── EMPANEL LOGIN ───
 const RefPartnerLoginPage = ({ onDone, onBack }) => {
   const [partnerId, setPartnerId] = useState("");
   const [pass, setPass] = useState("");
@@ -674,9 +674,9 @@ const RefPartnerLoginPage = ({ onDone, onBack }) => {
     <PageShell onBack={onBack}>
       <Brand small />
       <Card>
-        <h2 style={{ fontFamily: T.font, fontWeight: 600, fontSize: 20, color: T.text, margin: "0 0 6px", textAlign: "center" }}>Referral Partner Login</h2>
+        <h2 style={{ fontFamily: T.font, fontWeight: 600, fontSize: 20, color: T.text, margin: "0 0 6px", textAlign: "center" }}>Empanel Login</h2>
         <p style={{ fontSize: 13, color: T.textMuted, textAlign: "center", margin: "0 0 22px" }}>Sign in with your credentials</p>
-        <Input label="Referral Partner ID" placeholder="e.g. NC-CON-2026-48231" value={partnerId} onChange={setPartnerId} required icon="🔑" />
+        <Input label="Empanel ID" placeholder="e.g. NC-CON-2026-48231" value={partnerId} onChange={setPartnerId} required icon="🔑" />
         <Input label="Password" placeholder="Enter your password" value={pass} onChange={setPass} type="password" required icon="🔒" />
         <Btn onClick={handleLogin} disabled={!partnerId || !pass || loading} full color={T.green}>
           {loading ? "Signing in..." : "Login"}
@@ -868,7 +868,7 @@ const OpsAppDetailPage = ({ app, onAction, onBack }) => {
       {app.status !== "pending" && (
         <Card style={{ marginTop: 6, background: app.status === "approved" ? T.greenSoft : "rgba(248,113,113,.04)", border: `1px solid ${app.status === "approved" ? T.green + "20" : T.danger + "15"}` }}>
           <p style={{ fontFamily: T.font, fontWeight: 600, fontSize: 13, color: app.status === "approved" ? T.green : T.amber, margin: "0 0 6px" }}>{app.status === "approved" ? "✓ Approved — Credentials generated & sent" : "↩ Sent back for corrections"}</p>
-          {app.status === "approved" && <p style={{ fontSize: 12, color: T.textMuted, margin: 0 }}>Referral Partner ID: <span style={{ fontFamily: "monospace", color: T.accent }}>{app.connectorId || app.id}</span></p>}
+          {app.status === "approved" && <p style={{ fontSize: 12, color: T.textMuted, margin: 0 }}>Empanel ID: <span style={{ fontFamily: "monospace", color: T.accent }}>{app.connectorId || app.id}</span></p>}
           {app.status === "sent_back" && app.sendBackMsg && <p style={{ fontSize: 12, color: T.textMuted, margin: 0, lineHeight: 1.6 }}>Reason: {app.sendBackMsg}</p>}
         </Card>
       )}
@@ -914,11 +914,11 @@ export default function App() {
     case "login":
       return <LoginPage onSelect={role => setPage(role === "login" ? "ref_login" : role === "connector" ? (hasExistingApp ? "con_landing" : "con_google") : "ops_choice")} />;
 
-    // ─── REFERRAL PARTNER LOGIN ───
+    // ─── EMPANEL LOGIN ───
     case "ref_login":
       return <RefPartnerLoginPage onDone={() => setPage("con_landing")} onBack={goHome} />;
 
-    // ─── REFERRAL PARTNER ───
+    // ─── EMPANEL ───
     case "con_landing":
       return <ConnectorLandingPage existingApp={getConnectorApp()} onViewApp={() => setPage("con_status")} onNewApp={() => setPage("con_google")} onBack={goHome} />;
     case "con_status":
