@@ -215,25 +215,49 @@ const MobileAuthPage = ({ onDone, onBack }) => {
 
 // ─── DATA ENTRY ───
 const DataEntryPage = ({ onDone, onBack }) => {
-  const [form, setForm] = useState({ idType: "aadhaar", idNumber: "", name: "", address: "", company: "", refNumber: "" });
-  const [extracted, setExtracted] = useState(false);
+  const [form, setForm] = useState({ aadhaar: "", pan: "", name: "", address: "", company: "", refNumber: "" });
+  const [aadhaarExtracted, setAadhaarExtracted] = useState(false);
+  const [panExtracted, setPanExtracted] = useState(false);
   const set = (k, v) => setForm(p => ({ ...p, [k]: v }));
-  const extractName = () => { if (form.idNumber.length >= 4) { setExtracted(true); set("name", form.idType === "aadhaar" ? "Rajesh Kumar" : "Rajesh K"); } };
-  const valid = form.idNumber && form.name && form.address && form.company && form.refNumber;
+  const extractAadhaar = () => { if (form.aadhaar.length >= 4) { setAadhaarExtracted(true); set("name", "Rajesh Kumar"); } };
+  const extractPan = () => { if (form.pan.length >= 4) { setPanExtracted(true); if (!form.name) set("name", "Rajesh K"); } };
+  const valid = form.aadhaar && form.pan && form.name && form.address && form.company && form.refNumber;
   return (
     <PageShell onBack={onBack} step={2} totalSteps={6}>
       <Brand small />
+      <div style={{ display: "flex", gap: 12, marginBottom: 14 }}>
+        <Card style={{ flex: 1, padding: 18 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
+            <div style={{ width: 38, height: 38, borderRadius: 9, background: T.accentSoft, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>🪪</div>
+            <div>
+              <div style={{ fontFamily: T.font, fontWeight: 600, fontSize: 14, color: T.text }}>Aadhaar Card</div>
+              <div style={{ fontSize: 11, color: T.textDim }}>12-digit identity number</div>
+            </div>
+          </div>
+          <div style={{ display: "flex", gap: 8, alignItems: "flex-end" }}>
+            <div style={{ flex: 1 }}><Input label="Aadhaar Number" placeholder="XXXX XXXX XXXX" value={form.aadhaar} onChange={v => set("aadhaar", v)} required /></div>
+            <button onClick={extractAadhaar} style={{ padding: "10px 14px", marginBottom: 16, background: T.accentSoft, border: `1px solid ${T.accent}30`, borderRadius: 10, color: T.accent, fontFamily: T.font, fontWeight: 500, fontSize: 11, cursor: "pointer", whiteSpace: "nowrap" }}>Extract</button>
+          </div>
+          {aadhaarExtracted && <div style={{ padding: "8px 12px", background: T.greenSoft, border: `1px solid ${T.green}25`, borderRadius: 8, display: "flex", alignItems: "center", gap: 6 }}><span style={{ fontSize: 12 }}>✓</span><span style={{ fontSize: 11, color: T.green }}>Verified</span></div>}
+        </Card>
+        <Card style={{ flex: 1, padding: 18 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
+            <div style={{ width: 38, height: 38, borderRadius: 9, background: T.purpleSoft, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>📄</div>
+            <div>
+              <div style={{ fontFamily: T.font, fontWeight: 600, fontSize: 14, color: T.text }}>PAN Card</div>
+              <div style={{ fontSize: 11, color: T.textDim }}>Permanent account number</div>
+            </div>
+          </div>
+          <div style={{ display: "flex", gap: 8, alignItems: "flex-end" }}>
+            <div style={{ flex: 1 }}><Input label="PAN Number" placeholder="ABCDE1234F" value={form.pan} onChange={v => set("pan", v)} required /></div>
+            <button onClick={extractPan} style={{ padding: "10px 14px", marginBottom: 16, background: T.purpleSoft, border: `1px solid ${T.purple}30`, borderRadius: 10, color: T.purple, fontFamily: T.font, fontWeight: 500, fontSize: 11, cursor: "pointer", whiteSpace: "nowrap" }}>Extract</button>
+          </div>
+          {panExtracted && <div style={{ padding: "8px 12px", background: T.greenSoft, border: `1px solid ${T.green}25`, borderRadius: 8, display: "flex", alignItems: "center", gap: 6 }}><span style={{ fontSize: 12 }}>✓</span><span style={{ fontSize: 11, color: T.green }}>Verified</span></div>}
+        </Card>
+      </div>
       <Card>
         <h2 style={{ fontFamily: T.font, fontWeight: 600, fontSize: 20, color: T.text, margin: "0 0 6px" }}>Personal Details</h2>
-        <p style={{ fontSize: 13, color: T.textMuted, margin: "0 0 22px" }}>Enter your identification & contact details</p>
-        <div style={{ display: "flex", gap: 0, marginBottom: 16, background: T.inputBg, borderRadius: 10, border: `1px solid ${T.inputBorder}`, overflow: "hidden" }}>
-          {["aadhaar", "pan"].map(t => <button key={t} onClick={() => { set("idType", t); set("idNumber", ""); set("name", ""); setExtracted(false); }} style={{ flex: 1, padding: "10px 14px", background: form.idType === t ? T.accentSoft : "transparent", border: "none", color: form.idType === t ? T.accent : T.textMuted, fontFamily: T.font, fontWeight: 500, fontSize: 13, cursor: "pointer", transition: "all .25s", letterSpacing: ".02em", textTransform: "uppercase" }}>{t}</button>)}
-        </div>
-        <div style={{ display: "flex", gap: 10, alignItems: "flex-end" }}>
-          <div style={{ flex: 1 }}><Input label={form.idType === "aadhaar" ? "Aadhaar Number" : "PAN Number"} placeholder={form.idType === "aadhaar" ? "XXXX XXXX XXXX" : "ABCDE1234F"} value={form.idNumber} onChange={v => set("idNumber", v)} required icon={form.idType === "aadhaar" ? "🪪" : "📄"} /></div>
-          <button onClick={extractName} style={{ padding: "11px 16px", marginBottom: 16, background: T.accentSoft, border: `1px solid ${T.accent}30`, borderRadius: 10, color: T.accent, fontFamily: T.font, fontWeight: 500, fontSize: 12, cursor: "pointer", whiteSpace: "nowrap" }}>Extract</button>
-        </div>
-        {extracted && <div style={{ padding: "9px 14px", background: T.greenSoft, border: `1px solid ${T.green}25`, borderRadius: 10, marginBottom: 16, display: "flex", alignItems: "center", gap: 8 }}><span style={{ fontSize: 14 }}>✓</span><span style={{ fontSize: 13, color: T.green }}>Name extracted</span></div>}
+        <p style={{ fontSize: 13, color: T.textMuted, margin: "0 0 22px" }}>Enter your contact & work details</p>
         <Input label="Full Name" placeholder="Auto-extracted from ID" value={form.name} onChange={v => set("name", v)} required icon="👤" />
         <Input label="Current Address" placeholder="Full residential address" value={form.address} onChange={v => set("address", v)} required icon="📍" />
         <Input label="Current Working Company" placeholder="Company name" value={form.company} onChange={v => set("company", v)} required icon="🏢" />
