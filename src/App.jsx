@@ -126,7 +126,7 @@ const LoginPage = ({ onSelect }) => {
       <Brand />
       <p style={{ textAlign: "center", fontSize: 14, color: T.textDim, marginBottom: 30 }}>Select your role to continue</p>
       <div style={{ display: "flex", gap: 14 }}>
-        <RoleCard id="connector" icon="⚡" title="Connector" sub="Field ops & client connections" color={T.accent} />
+        <RoleCard id="connector" icon="⚡" title="Referral Partner" sub="Field ops & client connections" color={T.accent} />
         <RoleCard id="ops" icon="📊" title="Ops Manager" sub="Reports & analytics" color={T.purple} />
       </div>
       <div style={{ display: "flex", alignItems: "center", gap: 14, margin: "24px 0" }}>
@@ -134,37 +134,83 @@ const LoginPage = ({ onSelect }) => {
         <span style={{ fontSize: 11, color: T.textDim, fontFamily: T.font, letterSpacing: ".06em" }}>OR</span>
         <div style={{ flex: 1, height: 1, background: T.cardBorder }} />
       </div>
-      <RoleCard id="login" icon="🔐" title="Login" sub="Already a connector? Sign in here" color={T.green} />
+      <RoleCard id="login" icon="🔐" title="Login" sub="Already a referral partner? Sign in here" color={T.green} />
       <p style={{ textAlign: "center", marginTop: 36, fontSize: 11, color: T.textDim }}>Navachetana Livelihoods · Internal Portal</p>
     </PageShell>
   );
 };
 
 // ─── GOOGLE AUTH (reusable) ───
+const GOOGLE_CLIENT_ID = "828442976315-29947njoflscn4u45rn6en4upa48aa52.apps.googleusercontent.com";
+
 const GoogleAuthPage = ({ onDone, onBack, role }) => {
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
-  const handleClick = () => { setLoading(true); setTimeout(() => { setLoading(false); setDone(true); setTimeout(onDone, 700); }, 1600); };
+  const [error, setError] = useState(null);
+  const [user, setUser] = useState(null);
+
+  const handleGoogleSignIn = useCallback(() => {
+    setLoading(true);
+    setError(null);
+    try {
+      const client = window.google.accounts.oauth2.initTokenClient({
+        client_id: GOOGLE_CLIENT_ID,
+        scope: "email profile",
+        callback: (response) => {
+          if (response.error) {
+            setLoading(false);
+            setError("Authentication failed. Please try again.");
+            return;
+          }
+          fetch("https://www.googleapis.com/oauth2/v3/userinfo", {
+            headers: { Authorization: `Bearer ${response.access_token}` },
+          })
+            .then(r => r.json())
+            .then(info => {
+              setLoading(false);
+              setDone(true);
+              setUser({ name: info.name, email: info.email, picture: info.picture });
+              setTimeout(onDone, 1200);
+            })
+            .catch(() => {
+              setLoading(false);
+              setError("Could not fetch profile. Please try again.");
+            });
+        },
+      });
+      client.requestAccessToken();
+    } catch {
+      setLoading(false);
+      setError("Google Sign-In not available. Please try again.");
+    }
+  }, [onDone]);
+
   return (
     <PageShell onBack={onBack} step={role === "ops" ? 0 : 0} totalSteps={role === "ops" ? 2 : 6}>
       <Brand small />
       <Card>
         <h2 style={{ fontFamily: T.font, fontWeight: 600, fontSize: 20, color: T.text, margin: "0 0 6px", textAlign: "center" }}>Sign in with Google</h2>
-        <p style={{ fontSize: 13, color: T.textMuted, textAlign: "center", margin: "0 0 24px", lineHeight: 1.6 }}>Verify your identity to continue as {role === "ops" ? "Operations Manager" : "Connector"}</p>
-        {done ? (
+        <p style={{ fontSize: 13, color: T.textMuted, textAlign: "center", margin: "0 0 24px", lineHeight: 1.6 }}>Verify your identity to continue as {role === "ops" ? "Operations Manager" : "Referral Partner"}</p>
+        {done && user ? (
           <div style={{ textAlign: "center", padding: "16px 0" }}>
-            <div style={{ width: 52, height: 52, borderRadius: "50%", background: T.greenSoft, border: "2px solid " + T.green, display: "inline-flex", alignItems: "center", justifyContent: "center", animation: "checkPop .4s ease-out", marginBottom: 10 }}>
+            {user.picture && <img src={user.picture} alt="" style={{ width: 52, height: 52, borderRadius: "50%", border: "2px solid " + T.green, marginBottom: 10 }} />}
+            <div style={{ width: 52, height: 52, borderRadius: "50%", background: T.greenSoft, border: "2px solid " + T.green, display: "inline-flex", alignItems: "center", justifyContent: "center", animation: "checkPop .4s ease-out", marginBottom: 10, marginLeft: user.picture ? 0 : undefined, display: user.picture ? "none" : "inline-flex" }}>
               <span style={{ fontSize: 22 }}>✓</span>
             </div>
-            <p style={{ color: T.green, fontFamily: T.font, fontWeight: 500, fontSize: 14 }}>Authenticated</p>
+            <p style={{ color: T.text, fontFamily: T.font, fontWeight: 600, fontSize: 15, margin: "0 0 2px" }}>{user.name}</p>
+            <p style={{ color: T.textMuted, fontSize: 12, margin: "0 0 6px" }}>{user.email}</p>
+            <p style={{ color: T.green, fontFamily: T.font, fontWeight: 500, fontSize: 13 }}>Authenticated ✓</p>
           </div>
         ) : (
-          <button onClick={handleClick} disabled={loading} style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 12, padding: "13px 20px", background: "#fff", border: "1px solid #dadce0", borderRadius: 12, cursor: loading ? "wait" : "pointer", transition: "all .25s", boxShadow: "0 1px 3px rgba(0,0,0,.08)" }}>
-            {loading ? <div style={{ width: 20, height: 20, border: "2.5px solid #dadce0", borderTopColor: "#4285f4", borderRadius: "50%", animation: "spin .7s linear infinite" }} /> : (
-              <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z" /><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z" /><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z" /><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z" /></svg>
-            )}
-            <span style={{ fontFamily: T.fontBody, fontSize: 15, fontWeight: 500, color: "#3c4043" }}>{loading ? "Signing in..." : "Continue with Google"}</span>
-          </button>
+          <>
+            <button onClick={handleGoogleSignIn} disabled={loading} style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 12, padding: "13px 20px", background: "#fff", border: "1px solid #dadce0", borderRadius: 12, cursor: loading ? "wait" : "pointer", transition: "all .25s", boxShadow: "0 1px 3px rgba(0,0,0,.08)" }}>
+              {loading ? <div style={{ width: 20, height: 20, border: "2.5px solid #dadce0", borderTopColor: "#4285f4", borderRadius: "50%", animation: "spin .7s linear infinite" }} /> : (
+                <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z" /><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z" /><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z" /><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z" /></svg>
+              )}
+              <span style={{ fontFamily: T.fontBody, fontSize: 15, fontWeight: 500, color: "#3c4043" }}>{loading ? "Signing in..." : "Continue with Google"}</span>
+            </button>
+            {error && <p style={{ textAlign: "center", fontSize: 12, color: T.danger, marginTop: 12 }}>{error}</p>}
+          </>
         )}
       </Card>
     </PageShell>
@@ -309,9 +355,9 @@ const EAgreementPage = ({ onDone, onBack }) => {
   const scrollRef = useRef(null);
   const handleScroll = useCallback(() => { const el = scrollRef.current; if (el && (el.scrollTop + el.clientHeight >= el.scrollHeight - 20)) setScrolled(true); }, []);
   const lines = [
-    "E-AGREEMENT — NAVACHETANA LIVELIHOODS", "",
-    "This Connector Agreement ('Agreement') is entered into between Navachetana Livelihoods Pvt. Ltd. ('Company') and the undersigned individual ('Connector').", "",
-    "1. SCOPE OF ENGAGEMENT", "The Connector shall act as an independent facilitator, assisting in identifying potential borrowers, collecting documentation, and facilitating loan applications within the assigned territory.", "",
+    "E-AGREEMENT — NAVACHETANA LIVELIHOODS (REFERRAL PARTNER)", "",
+    "This Referral Partner Agreement ('Agreement') is entered into between Navachetana Livelihoods Pvt. Ltd. ('Company') and the undersigned individual ('Referral Partner').", "",
+    "1. SCOPE OF ENGAGEMENT", "The Referral Partner shall act as an independent facilitator, assisting in identifying potential borrowers, collecting documentation, and facilitating loan applications within the assigned territory.", "",
     "2. RESPONSIBILITIES", "2.1 Comply with all applicable RBI guidelines and NBFC-MFI regulations.", "2.2 Conduct due diligence on prospective borrowers and verify documentation.", "2.3 All client information is confidential and proprietary to the Company.", "",
     "3. COMPENSATION", "3.1 Commission as per the prevailing rate card.", "3.2 Payments processed within 15 business days of loan disbursement.", "3.3 Disputes resolved through the Company's grievance mechanism.", "",
     "4. CODE OF CONDUCT", "4.1 No coercive recovery practices.", "4.2 Maintain transparency with borrowers regarding terms.", "4.3 No direct money collection from borrowers.", "",
@@ -390,12 +436,12 @@ const ConnectorStatusPage = ({ appData, onBack }) => (
             <span style={{ fontSize: 38 }}>🎉</span>
           </div>
           <h2 style={{ fontFamily: T.font, fontWeight: 700, fontSize: 24, color: T.text, margin: "0 0 8px" }}>You're Approved!</h2>
-          <p style={{ fontSize: 14, color: T.textMuted, margin: "0 0 24px" }}>Your connector account has been activated</p>
+          <p style={{ fontSize: 14, color: T.textMuted, margin: "0 0 24px" }}>Your referral partner account has been activated</p>
           <Card style={{ textAlign: "left", marginBottom: 16 }}>
             <p style={{ fontSize: 11, fontWeight: 600, color: T.green, letterSpacing: ".08em", textTransform: "uppercase", margin: "0 0 14px", fontFamily: T.font }}>Your Login Credentials</p>
             <div style={{ padding: "14px", background: "rgba(0,0,0,.25)", borderRadius: 10, border: `1px solid ${T.cardBorder}`, marginBottom: 14 }}>
               <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 10 }}>
-                <span style={{ fontSize: 12, color: T.textMuted }}>Connector ID</span>
+                <span style={{ fontSize: 12, color: T.textMuted }}>Referral Partner ID</span>
                 <span style={{ fontSize: 14, fontWeight: 600, fontFamily: "monospace", color: T.accent }}>{appData.connectorId || appData.id}</span>
               </div>
               <div style={{ height: 1, background: T.cardBorder, margin: "0 0 10px" }} />
@@ -448,7 +494,7 @@ const ConnectorStatusPage = ({ appData, onBack }) => (
           </Card>
         </>
       )}
-      <p style={{ marginTop: 28, fontSize: 11, color: T.textDim }}>Navachetana Livelihoods · Connector Onboarding</p>
+      <p style={{ marginTop: 28, fontSize: 11, color: T.textDim }}>Navachetana Livelihoods · Referral Partner Onboarding</p>
     </div>
   </PageShell>
 );
@@ -485,7 +531,7 @@ const ConnectorLandingPage = ({ existingApp, onNewApp, onViewApp, onBack }) => {
       <div onClick={onNewApp} onMouseEnter={() => setHov("new")} onMouseLeave={() => setHov(null)} style={{ padding: "20px", background: hov === "new" ? `linear-gradient(160deg,${T.green}10,transparent)` : T.card, border: `1.5px dashed ${hov === "new" ? T.green + "60" : T.cardBorder}`, borderRadius: 14, cursor: "pointer", transition: "all .35s", textAlign: "center", transform: hov === "new" ? "translateY(-2px)" : "none" }}>
         <div style={{ fontSize: 28, marginBottom: 8 }}>➕</div>
         <div style={{ fontFamily: T.font, fontWeight: 600, fontSize: 15, color: hov === "new" ? T.text : "#c9d1d9" }}>Empanel</div>
-        <div style={{ fontSize: 12, color: T.textDim, marginTop: 4 }}>Begin a fresh connector empanelment</div>
+        <div style={{ fontSize: 12, color: T.textDim, marginTop: 4 }}>Begin a fresh referral partner empanelment</div>
       </div>
     </PageShell>
   );
@@ -673,7 +719,7 @@ const OpsAppDetailPage = ({ app, onAction, onBack }) => {
       {app.status !== "pending" && (
         <Card style={{ marginTop: 6, background: app.status === "approved" ? T.greenSoft : "rgba(248,113,113,.04)", border: `1px solid ${app.status === "approved" ? T.green + "20" : T.danger + "15"}` }}>
           <p style={{ fontFamily: T.font, fontWeight: 600, fontSize: 13, color: app.status === "approved" ? T.green : T.amber, margin: "0 0 6px" }}>{app.status === "approved" ? "✓ Approved — Credentials generated & sent" : "↩ Sent back for corrections"}</p>
-          {app.status === "approved" && <p style={{ fontSize: 12, color: T.textMuted, margin: 0 }}>Connector ID: <span style={{ fontFamily: "monospace", color: T.accent }}>{app.connectorId || app.id}</span></p>}
+          {app.status === "approved" && <p style={{ fontSize: 12, color: T.textMuted, margin: 0 }}>Referral Partner ID: <span style={{ fontFamily: "monospace", color: T.accent }}>{app.connectorId || app.id}</span></p>}
           {app.status === "sent_back" && app.sendBackMsg && <p style={{ fontSize: 12, color: T.textMuted, margin: 0, lineHeight: 1.6 }}>Reason: {app.sendBackMsg}</p>}
         </Card>
       )}
