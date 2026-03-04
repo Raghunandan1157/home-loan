@@ -455,8 +455,8 @@ const ConnectorLandingPage = ({ existingApp, onNewApp, onViewApp, onBack }) => {
       </div>
       <div onClick={onNewApp} onMouseEnter={() => setHov("new")} onMouseLeave={() => setHov(null)} style={{ padding: "20px", background: hov === "new" ? `linear-gradient(160deg,${T.green}10,transparent)` : T.card, border: `1.5px dashed ${hov === "new" ? T.green + "60" : T.cardBorder}`, borderRadius: 14, cursor: "pointer", transition: "all .35s", textAlign: "center", transform: hov === "new" ? "translateY(-2px)" : "none" }}>
         <div style={{ fontSize: 28, marginBottom: 8 }}>➕</div>
-        <div style={{ fontFamily: T.font, fontWeight: 600, fontSize: 15, color: hov === "new" ? T.text : "#c9d1d9" }}>Start New Application</div>
-        <div style={{ fontSize: 12, color: T.textDim, marginTop: 4 }}>Begin a fresh connector onboarding</div>
+        <div style={{ fontFamily: T.font, fontWeight: 600, fontSize: 15, color: hov === "new" ? T.text : "#c9d1d9" }}>Empanel</div>
+        <div style={{ fontSize: 12, color: T.textDim, marginTop: 4 }}>Begin a fresh connector empanelment</div>
       </div>
     </PageShell>
   );
