@@ -129,6 +129,12 @@ const LoginPage = ({ onSelect }) => {
         <RoleCard id="connector" icon="⚡" title="Connector" sub="Field ops & client connections" color={T.accent} />
         <RoleCard id="ops" icon="📊" title="Ops Manager" sub="Reports & analytics" color={T.purple} />
       </div>
+      <div style={{ display: "flex", alignItems: "center", gap: 14, margin: "24px 0" }}>
+        <div style={{ flex: 1, height: 1, background: T.cardBorder }} />
+        <span style={{ fontSize: 11, color: T.textDim, fontFamily: T.font, letterSpacing: ".06em" }}>OR</span>
+        <div style={{ flex: 1, height: 1, background: T.cardBorder }} />
+      </div>
+      <RoleCard id="login" icon="🔐" title="Login" sub="Already a connector? Sign in here" color={T.green} />
       <p style={{ textAlign: "center", marginTop: 36, fontSize: 11, color: T.textDim }}>Navachetana Livelihoods · Internal Portal</p>
     </PageShell>
   );
@@ -669,7 +675,7 @@ export default function App() {
 
   switch (page) {
     case "login":
-      return <LoginPage onSelect={role => setPage(role === "connector" ? (hasExistingApp ? "con_landing" : "con_google") : "ops_choice")} />;
+      return <LoginPage onSelect={role => setPage(role === "login" ? "con_google" : role === "connector" ? (hasExistingApp ? "con_landing" : "con_google") : "ops_choice")} />;
 
     // ─── CONNECTOR ───
     case "con_landing":
