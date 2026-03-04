@@ -693,13 +693,26 @@ const OpsAppDetailPage = ({ app, onAction, onBack }) => {
   );
 };
 
+// ─── Persist helpers ───
+const STORAGE_KEY = "navachetana_state";
+const loadState = () => { try { const s = localStorage.getItem(STORAGE_KEY); return s ? JSON.parse(s) : null; } catch { return null; } };
+const saveState = (s) => { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(s)); } catch {} };
+
 // ═══════════════════════ MAIN APP ═══════════════════════
 export default function App() {
-  const [page, setPage] = useState("login");
-  const [apps, setApps] = useState(DUMMY_APPS);
-  const [selectedApp, setSelectedApp] = useState(null);
-  const [connectorApp, setConnectorApp] = useState({ ...PREV_CONNECTOR_APP });
-  const [hasExistingApp, setHasExistingApp] = useState(true);
+  const saved = useRef(loadState()).current;
+  const [page, setPageRaw] = useState(saved?.page || "login");
+  const [apps, setApps] = useState(saved?.apps || DUMMY_APPS);
+  const [selectedApp, setSelectedApp] = useState(saved?.selectedApp || null);
+  const [connectorApp, setConnectorApp] = useState(saved?.connectorApp || { ...PREV_CONNECTOR_APP });
+  const [hasExistingApp, setHasExistingApp] = useState(saved?.hasExistingApp ?? true);
+
+  const setPage = useCallback((p) => { setPageRaw(p); }, []);
+
+  // Save state on every change
+  useEffect(() => {
+    saveState({ page, apps, selectedApp, connectorApp, hasExistingApp });
+  }, [page, apps, selectedApp, connectorApp, hasExistingApp]);
 
   const goHome = () => setPage("login");
 
