@@ -107,237 +107,58 @@ const StatusBadge = ({ status }) => {
   return <span style={{ display: "inline-flex", alignItems: "center", gap: 5, padding: "4px 12px", borderRadius: 20, background: m.bg, border: `1px solid ${m.border}`, fontSize: 11, fontWeight: 600, fontFamily: T.font, color: m.color, letterSpacing: ".03em" }}>● {m.label}</span>;
 };
 
-// ─── LOGIN (Website-style with nav) ───
+// ─── LOGIN ───
 const LoginPage = ({ onSelect }) => {
-  const [dropOpen, setDropOpen] = useState(false);
-  const [modal, setModal] = useState(null); // null | "choose" | "referral" | "ops"
-  const [loginId, setLoginId] = useState("");
-  const [loginPass, setLoginPass] = useState("");
-  const [loginLoading, setLoginLoading] = useState(false);
-  const dropRef = useRef(null);
-
-  useEffect(() => {
-    const handler = (e) => { if (dropRef.current && !dropRef.current.contains(e.target)) setDropOpen(false); };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, []);
-
-  const handleLogin = (e) => {
-    e.preventDefault();
-    if (!loginId || !loginPass) return;
-    setLoginLoading(true);
-    setTimeout(() => {
-      setLoginLoading(false);
-      setModal(null);
-      setLoginId(""); setLoginPass("");
-      onSelect("login");
-    }, 1200);
-  };
-
-  const openRole = (role) => { setModal(role); setLoginId(""); setLoginPass(""); setLoginLoading(false); };
-
-  const navS = { position:"fixed",top:0,left:0,right:0,height:70,background:"rgba(255,255,255,0.97)",backdropFilter:"blur(10px)",zIndex:100,boxShadow:"0 1px 3px rgba(0,0,0,.08)",display:"flex",alignItems:"center",padding:"0 32px",fontFamily:"'Inter','Outfit',sans-serif" };
-  const linkS = { fontSize:14,fontWeight:500,color:"#475569",cursor:"pointer",padding:"8px 0",position:"relative",transition:"color .2s",background:"none",border:"none",fontFamily:"inherit" };
-  const linkActiveS = { ...linkS, color:"#0d9488" };
-
-  return (
-    <div style={{ minHeight:"100vh",background:"#fff",fontFamily:"'Inter','Outfit',sans-serif" }}>
-      <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-      {/* Navbar */}
-      <nav style={navS}>
-        <div style={{ display:"flex",alignItems:"center",gap:10,marginRight:"auto" }}>
-          <div style={{ width:40,height:40,borderRadius:10,background:"linear-gradient(135deg,#0d9488,#84cc16)",display:"flex",alignItems:"center",justifyContent:"center" }}>
-            <span style={{ color:"#fff",fontWeight:700,fontSize:18 }}>N</span>
-          </div>
-          <div style={{ lineHeight:1.15 }}>
-            <div style={{ fontSize:16,fontWeight:700,color:"#0d9488" }}>Navachetana</div>
-            <div style={{ fontSize:12,fontWeight:600,color:"#84cc16" }}>Livelihoods</div>
-          </div>
-        </div>
-        <div style={{ display:"flex",alignItems:"center",gap:28 }}>
-          <span style={linkActiveS}>Home</span>
-          <span style={linkS}>About</span>
-          <span style={linkS}>Services</span>
-          <span style={linkS}>How It Works</span>
-          {/* Empanel Dropdown */}
-          <div ref={dropRef} style={{ position:"relative" }}>
-            <button onClick={() => setDropOpen(!dropOpen)} style={{ ...linkS, display:"flex",alignItems:"center",gap:4 }}>
-              Empanel <span style={{ fontSize:10,transition:"transform .2s",transform:dropOpen?"rotate(180deg)":"none" }}>▾</span>
-            </button>
-            {dropOpen && (
-              <div style={{ position:"absolute",top:"calc(100% + 8px)",right:0,background:"#fff",borderRadius:12,boxShadow:"0 20px 40px -8px rgba(0,0,0,.15)",border:"1px solid #e2e8f0",minWidth:210,padding:6,zIndex:101,animation:"fadeUp .2s ease-out" }}>
-                <button onClick={() => { setDropOpen(false); openRole("referral"); }} style={{ display:"flex",alignItems:"center",gap:10,width:"100%",padding:"10px 14px",border:"none",background:"transparent",borderRadius:8,cursor:"pointer",textAlign:"left",transition:"background .15s",fontFamily:"inherit" }} onMouseEnter={e=>e.currentTarget.style.background="#f0fdfa"} onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
-                  <span style={{ fontSize:16 }}>⚡</span>
-                  <span style={{ fontSize:14,fontWeight:500,color:"#1e293b" }}>Empanel</span>
-                </button>
-                <button onClick={() => { setDropOpen(false); setModal("choose"); }} style={{ display:"flex",alignItems:"center",gap:10,width:"100%",padding:"10px 14px",border:"none",background:"transparent",borderRadius:8,cursor:"pointer",textAlign:"left",transition:"background .15s",fontFamily:"inherit" }} onMouseEnter={e=>e.currentTarget.style.background="#f0fdfa"} onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
-                  <span style={{ fontSize:16 }}>🔐</span>
-                  <span style={{ fontSize:14,fontWeight:500,color:"#1e293b" }}>Login</span>
-                </button>
-              </div>
-            )}
-          </div>
-          <button onClick={() => onSelect("connector")} style={{ padding:"10px 22px",background:"#0d9488",color:"#fff",border:"none",borderRadius:8,fontWeight:600,fontSize:14,cursor:"pointer",fontFamily:"inherit",transition:"all .2s" }} onMouseEnter={e=>e.currentTarget.style.background="#0f766e"} onMouseLeave={e=>e.currentTarget.style.background="#0d9488"}>
-            Contact Us
-          </button>
-        </div>
-      </nav>
-
-      {/* Hero */}
-      <div style={{ paddingTop:70,minHeight:"100vh",display:"flex",alignItems:"center",background:"linear-gradient(135deg,#f0fdfa 0%,#fff 50%,#ecfdf5 100%)" }}>
-        <div style={{ maxWidth:1200,margin:"0 auto",padding:"60px 32px",display:"flex",alignItems:"center",gap:60 }}>
-          <div style={{ flex:1 }}>
-            <h1 style={{ fontSize:48,fontWeight:700,color:"#1e293b",lineHeight:1.15,marginBottom:20 }}>
-              Welcome to <span style={{ color:"#0d9488" }}>Navachetana Livelihoods</span>
-            </h1>
-            <p style={{ fontSize:18,color:"#475569",lineHeight:1.7,marginBottom:32,maxWidth:520 }}>
-              Empowering growth through microfinance. Accessible financial solutions for rural communities, women entrepreneurs, and small businesses across India.
-            </p>
-            <div style={{ display:"flex",gap:14 }}>
-              <button onClick={() => onSelect("connector")} style={{ padding:"14px 32px",background:"#0d9488",color:"#fff",border:"2px solid #0d9488",borderRadius:10,fontWeight:600,fontSize:16,cursor:"pointer",fontFamily:"inherit",transition:"all .25s" }} onMouseEnter={e=>{e.currentTarget.style.background="#0f766e";e.currentTarget.style.borderColor="#0f766e"}} onMouseLeave={e=>{e.currentTarget.style.background="#0d9488";e.currentTarget.style.borderColor="#0d9488"}}>
-                Get Started
-              </button>
-              <button onClick={() => setModal("choose")} style={{ padding:"14px 32px",background:"transparent",color:"#0d9488",border:"2px solid #0d9488",borderRadius:10,fontWeight:600,fontSize:16,cursor:"pointer",fontFamily:"inherit",transition:"all .25s" }} onMouseEnter={e=>e.currentTarget.style.background="#f0fdfa"} onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
-                Partner Login
-              </button>
-            </div>
-            <div style={{ display:"flex",gap:40,marginTop:48 }}>
-              {[["10,000+","Borrowers"],["500+","Partners"],["₹50Cr+","Disbursed"]].map(([n,l])=>(
-                <div key={l}><div style={{ fontSize:28,fontWeight:700,color:"#0d9488" }}>{n}</div><div style={{ fontSize:13,color:"#94a3b8",marginTop:2 }}>{l}</div></div>
-              ))}
-            </div>
-          </div>
-          <div style={{ flex:1,display:"flex",justifyContent:"center" }}>
-            <div style={{ width:360,height:360,borderRadius:"50%",background:"linear-gradient(135deg,#0d948830,#84cc1620)",display:"flex",alignItems:"center",justifyContent:"center",boxShadow:"0 40px 80px -20px rgba(13,148,136,.2)" }}>
-              <div style={{ width:280,height:280,borderRadius:"50%",background:"linear-gradient(135deg,#0d948815,#84cc1610)",display:"flex",alignItems:"center",justifyContent:"center" }}>
-                <span style={{ fontSize:80 }}>🏦</span>
-              </div>
-            </div>
-          </div>
-        </div>
+  const [hov, setHov] = useState(null);
+  const RoleCard = ({ id, icon, title, sub, color }) => (
+    <button onClick={() => onSelect(id)} onMouseEnter={() => setHov(id)} onMouseLeave={() => setHov(null)} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 14, padding: "34px 18px", background: hov === id ? `linear-gradient(160deg,${color}15,${color}06,transparent)` : T.card, border: `1px solid ${hov === id ? color + "55" : T.cardBorder}`, borderRadius: 16, cursor: "pointer", transition: "all .4s cubic-bezier(.16,1,.3,1)", transform: hov === id ? "translateY(-4px)" : "none", boxShadow: hov === id ? `0 20px 50px -12px ${color}28` : "0 4px 16px rgba(0,0,0,.2)", position: "relative", overflow: "hidden" }}>
+      {hov === id && <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 2, background: `linear-gradient(90deg,transparent,${color},transparent)`, animation: "shimmer 1.5s ease-in-out infinite" }} />}
+      <div style={{ width: 56, height: 56, borderRadius: 13, display: "flex", alignItems: "center", justifyContent: "center", background: `linear-gradient(135deg,${color}20,${color}08)`, border: `1px solid ${color}30`, fontSize: 26, transition: "transform .3s", transform: hov === id ? "scale(1.08)" : "scale(1)" }}>{icon}</div>
+      <div style={{ textAlign: "center" }}>
+        <div style={{ fontFamily: T.font, fontWeight: 600, fontSize: 17, color: hov === id ? T.text : "#c9d1d9", transition: "color .3s" }}>{title}</div>
+        <div style={{ fontFamily: T.fontBody, fontSize: 12, color: T.textDim, marginTop: 4 }}>{sub}</div>
       </div>
-
-      {/* Login Modal */}
-      {modal && (
-        <div onClick={(e) => { if (e.target === e.currentTarget) { setModal(null); setLoginId(""); setLoginPass(""); } }} style={{ position:"fixed",inset:0,background:"rgba(15,23,42,0.5)",backdropFilter:"blur(8px)",zIndex:200,display:"flex",alignItems:"center",justifyContent:"center",animation:"fadeUp .2s ease-out" }}>
-          <div style={{ background:"#fff",borderRadius:16,padding:"36px",width:"90%",maxWidth:420,boxShadow:"0 25px 60px -12px rgba(0,0,0,.25)",position:"relative" }}>
-            <button onClick={() => { setModal(null); setLoginId(""); setLoginPass(""); }} style={{ position:"absolute",top:14,right:18,background:"none",border:"none",fontSize:24,color:"#94a3b8",cursor:"pointer" }}>×</button>
-
-            {modal === "choose" ? (
-              <>
-                <div style={{ textAlign:"center",fontSize:36,marginBottom:10 }}>🔐</div>
-                <h2 style={{ textAlign:"center",fontSize:22,fontWeight:700,color:"#1e293b",marginBottom:4 }}>Login</h2>
-                <p style={{ textAlign:"center",fontSize:14,color:"#94a3b8",marginBottom:24 }}>Select your role to continue</p>
-                <div style={{ display:"flex",flexDirection:"column",gap:10 }}>
-                  {[["referral","⚡","Empanel","Field ops & client connections"],["ops","📊","Operational Manager","Reports & analytics"]].map(([id,ic,nm,desc])=>(
-                    <button key={id} onClick={() => openRole(id)} style={{ display:"flex",alignItems:"center",gap:14,padding:"16px 18px",background:"#f0fdfa",border:"2px solid transparent",borderRadius:12,cursor:"pointer",textAlign:"left",transition:"all .25s",fontFamily:"inherit" }} onMouseEnter={e=>{e.currentTarget.style.borderColor="#0d9488";e.currentTarget.style.background="#fff";e.currentTarget.style.boxShadow="0 4px 12px rgba(0,0,0,.08)"}} onMouseLeave={e=>{e.currentTarget.style.borderColor="transparent";e.currentTarget.style.background="#f0fdfa";e.currentTarget.style.boxShadow="none"}}>
-                      <div style={{ width:44,height:44,borderRadius:10,background:"#fff",boxShadow:"0 1px 3px rgba(0,0,0,.08)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:20,flexShrink:0 }}>{ic}</div>
-                      <div><div style={{ fontWeight:600,fontSize:15,color:"#1e293b" }}>{nm}</div><div style={{ fontSize:12,color:"#94a3b8",marginTop:2 }}>{desc}</div></div>
-                    </button>
-                  ))}
-                </div>
-              </>
-            ) : (
-              <>
-                <button onClick={() => setModal("choose")} style={{ background:"none",border:"none",color:"#94a3b8",fontSize:14,fontWeight:500,cursor:"pointer",marginBottom:14,padding:0,fontFamily:"inherit" }}>← Back</button>
-                <div style={{ textAlign:"center",fontSize:36,marginBottom:10 }}>{modal === "referral" ? "⚡" : "📊"}</div>
-                <h2 style={{ textAlign:"center",fontSize:22,fontWeight:700,color:"#1e293b",marginBottom:4 }}>{modal === "referral" ? "Empanel Login" : "Operational Manager Login"}</h2>
-                <p style={{ textAlign:"center",fontSize:14,color:"#94a3b8",marginBottom:24 }}>Enter your credentials to sign in</p>
-                <form onSubmit={handleLogin}>
-                  <div style={{ marginBottom:14 }}>
-                    <label style={{ display:"block",fontSize:12,fontWeight:600,color:"#475569",textTransform:"uppercase",letterSpacing:".04em",marginBottom:6 }}>ID</label>
-                    <input value={loginId} onChange={e=>setLoginId(e.target.value)} placeholder={modal === "referral" ? "e.g. NC-CON-2026-48231" : "e.g. NV-OPS-001"} required style={{ width:"100%",padding:"12px 14px",border:"1.5px solid #e2e8f0",borderRadius:8,fontSize:15,fontFamily:"inherit",color:"#1e293b",background:"#f0fdfa",transition:"all .25s",boxSizing:"border-box" }} onFocus={e=>{e.target.style.borderColor="#0d9488";e.target.style.boxShadow="0 0 0 3px rgba(13,148,136,.1)";e.target.style.background="#fff"}} onBlur={e=>{e.target.style.borderColor="#e2e8f0";e.target.style.boxShadow="none";e.target.style.background="#f0fdfa"}} />
-                  </div>
-                  <div style={{ marginBottom:20 }}>
-                    <label style={{ display:"block",fontSize:12,fontWeight:600,color:"#475569",textTransform:"uppercase",letterSpacing:".04em",marginBottom:6 }}>Password</label>
-                    <input type="password" value={loginPass} onChange={e=>setLoginPass(e.target.value)} placeholder="Enter your password" required style={{ width:"100%",padding:"12px 14px",border:"1.5px solid #e2e8f0",borderRadius:8,fontSize:15,fontFamily:"inherit",color:"#1e293b",background:"#f0fdfa",transition:"all .25s",boxSizing:"border-box" }} onFocus={e=>{e.target.style.borderColor="#0d9488";e.target.style.boxShadow="0 0 0 3px rgba(13,148,136,.1)";e.target.style.background="#fff"}} onBlur={e=>{e.target.style.borderColor="#e2e8f0";e.target.style.boxShadow="none";e.target.style.background="#f0fdfa"}} />
-                  </div>
-                  <button type="submit" disabled={!loginId||!loginPass||loginLoading} style={{ width:"100%",padding:"13px",background:loginLoading?"#10b981":"#0d9488",color:"#fff",border:"none",borderRadius:10,fontWeight:600,fontSize:15,cursor:loginLoading?"wait":"pointer",fontFamily:"inherit",transition:"all .25s",opacity:(!loginId||!loginPass)?0.5:1 }}>
-                    {loginLoading ? "Signing in..." : "Login"}
-                  </button>
-                </form>
-              </>
-            )}
-          </div>
-        </div>
-      )}
-
-      <p style={{ textAlign:"center",padding:"40px 0",fontSize:13,color:"#94a3b8" }}>© 2026 Navachetana Livelihoods Pvt. Ltd. All rights reserved.</p>
-    </div>
+      <div style={{ fontSize: 11, fontWeight: 500, color: hov === id ? color : T.textDim, letterSpacing: ".06em", textTransform: "uppercase", transition: "all .3s", display: "flex", alignItems: "center", gap: 4 }}>Continue <span style={{ display: "inline-block", transform: hov === id ? "translateX(4px)" : "none", transition: "transform .3s" }}>→</span></div>
+    </button>
+  );
+  return (
+    <PageShell>
+      <Brand />
+      <p style={{ textAlign: "center", fontSize: 14, color: T.textDim, marginBottom: 30 }}>Select your role to continue</p>
+      <div style={{ display: "flex", gap: 14 }}>
+        <RoleCard id="connector" icon="⚡" title="Connector" sub="Field ops & client connections" color={T.accent} />
+        <RoleCard id="ops" icon="📊" title="Ops Manager" sub="Reports & analytics" color={T.purple} />
+      </div>
+      <p style={{ textAlign: "center", marginTop: 36, fontSize: 11, color: T.textDim }}>Navachetana Livelihoods · Internal Portal</p>
+    </PageShell>
   );
 };
 
 // ─── GOOGLE AUTH (reusable) ───
-const GOOGLE_CLIENT_ID = "828442976315-29947njoflscn4u45rn6en4upa48aa52.apps.googleusercontent.com";
-
 const GoogleAuthPage = ({ onDone, onBack, role }) => {
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
-  const [error, setError] = useState(null);
-  const [user, setUser] = useState(null);
-
-  const handleGoogleSignIn = useCallback(() => {
-    setLoading(true);
-    setError(null);
-    try {
-      const client = window.google.accounts.oauth2.initTokenClient({
-        client_id: GOOGLE_CLIENT_ID,
-        scope: "email profile",
-        callback: (response) => {
-          if (response.error) {
-            setLoading(false);
-            setError("Authentication failed. Please try again.");
-            return;
-          }
-          fetch("https://www.googleapis.com/oauth2/v3/userinfo", {
-            headers: { Authorization: `Bearer ${response.access_token}` },
-          })
-            .then(r => r.json())
-            .then(info => {
-              setLoading(false);
-              setDone(true);
-              setUser({ name: info.name, email: info.email, picture: info.picture });
-              setTimeout(onDone, 1200);
-            })
-            .catch(() => {
-              setLoading(false);
-              setError("Could not fetch profile. Please try again.");
-            });
-        },
-      });
-      client.requestAccessToken();
-    } catch {
-      setLoading(false);
-      setError("Google Sign-In not available. Please try again.");
-    }
-  }, [onDone]);
-
+  const handleClick = () => { setLoading(true); setTimeout(() => { setLoading(false); setDone(true); setTimeout(onDone, 700); }, 1600); };
   return (
     <PageShell onBack={onBack} step={role === "ops" ? 0 : 0} totalSteps={role === "ops" ? 2 : 6}>
       <Brand small />
       <Card>
         <h2 style={{ fontFamily: T.font, fontWeight: 600, fontSize: 20, color: T.text, margin: "0 0 6px", textAlign: "center" }}>Sign in with Google</h2>
-        <p style={{ fontSize: 13, color: T.textMuted, textAlign: "center", margin: "0 0 24px", lineHeight: 1.6 }}>Verify your identity to continue as {role === "ops" ? "Operations Manager" : "Empanel"}</p>
-        {done && user ? (
+        <p style={{ fontSize: 13, color: T.textMuted, textAlign: "center", margin: "0 0 24px", lineHeight: 1.6 }}>Verify your identity to continue as {role === "ops" ? "Operations Manager" : "Connector"}</p>
+        {done ? (
           <div style={{ textAlign: "center", padding: "16px 0" }}>
-            {user.picture && <img src={user.picture} alt="" style={{ width: 52, height: 52, borderRadius: "50%", border: "2px solid " + T.green, marginBottom: 10 }} />}
-            <div style={{ width: 52, height: 52, borderRadius: "50%", background: T.greenSoft, border: "2px solid " + T.green, display: "inline-flex", alignItems: "center", justifyContent: "center", animation: "checkPop .4s ease-out", marginBottom: 10, marginLeft: user.picture ? 0 : undefined, display: user.picture ? "none" : "inline-flex" }}>
+            <div style={{ width: 52, height: 52, borderRadius: "50%", background: T.greenSoft, border: "2px solid " + T.green, display: "inline-flex", alignItems: "center", justifyContent: "center", animation: "checkPop .4s ease-out", marginBottom: 10 }}>
               <span style={{ fontSize: 22 }}>✓</span>
             </div>
-            <p style={{ color: T.text, fontFamily: T.font, fontWeight: 600, fontSize: 15, margin: "0 0 2px" }}>{user.name}</p>
-            <p style={{ color: T.textMuted, fontSize: 12, margin: "0 0 6px" }}>{user.email}</p>
-            <p style={{ color: T.green, fontFamily: T.font, fontWeight: 500, fontSize: 13 }}>Authenticated ✓</p>
+            <p style={{ color: T.green, fontFamily: T.font, fontWeight: 500, fontSize: 14 }}>Authenticated</p>
           </div>
         ) : (
-          <>
-            <button onClick={handleGoogleSignIn} disabled={loading} style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 12, padding: "13px 20px", background: "#fff", border: "1px solid #dadce0", borderRadius: 12, cursor: loading ? "wait" : "pointer", transition: "all .25s", boxShadow: "0 1px 3px rgba(0,0,0,.08)" }}>
-              {loading ? <div style={{ width: 20, height: 20, border: "2.5px solid #dadce0", borderTopColor: "#4285f4", borderRadius: "50%", animation: "spin .7s linear infinite" }} /> : (
-                <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z" /><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z" /><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z" /><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z" /></svg>
-              )}
-              <span style={{ fontFamily: T.fontBody, fontSize: 15, fontWeight: 500, color: "#3c4043" }}>{loading ? "Signing in..." : "Continue with Google"}</span>
-            </button>
-            {error && <p style={{ textAlign: "center", fontSize: 12, color: T.danger, marginTop: 12 }}>{error}</p>}
-          </>
+          <button onClick={handleClick} disabled={loading} style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "center", gap: 12, padding: "13px 20px", background: "#fff", border: "1px solid #dadce0", borderRadius: 12, cursor: loading ? "wait" : "pointer", transition: "all .25s", boxShadow: "0 1px 3px rgba(0,0,0,.08)" }}>
+            {loading ? <div style={{ width: 20, height: 20, border: "2.5px solid #dadce0", borderTopColor: "#4285f4", borderRadius: "50%", animation: "spin .7s linear infinite" }} /> : (
+              <svg width="20" height="20" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z" /><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z" /><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z" /><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z" /></svg>
+            )}
+            <span style={{ fontFamily: T.fontBody, fontSize: 15, fontWeight: 500, color: "#3c4043" }}>{loading ? "Signing in..." : "Continue with Google"}</span>
+          </button>
         )}
       </Card>
     </PageShell>
@@ -388,82 +209,27 @@ const MobileAuthPage = ({ onDone, onBack }) => {
 
 // ─── DATA ENTRY ───
 const DataEntryPage = ({ onDone, onBack }) => {
-  const [form, setForm] = useState({ aadhaar: "", pan: "", name: "", permanentAddress: "", communicationAddress: "", company: "", refNumber: "" });
-  const [aadhaarExtracted, setAadhaarExtracted] = useState(false);
+  const [form, setForm] = useState({ idType: "aadhaar", idNumber: "", name: "", address: "", company: "", refNumber: "" });
+  const [extracted, setExtracted] = useState(false);
   const set = (k, v) => setForm(p => ({ ...p, [k]: v }));
-  const extractAadhaar = () => { 
-    if (form.aadhaar.length >= 4) { 
-      setAadhaarExtracted(true); 
-      setForm(p => ({ 
-        ...p, 
-        name: "Rajesh Kumar", 
-        permanentAddress: "123, 4th Cross, JP Nagar, Bengaluru 560078",
-        communicationAddress: "123, 4th Cross, JP Nagar, Bengaluru 560078"
-      }));
-    }
-  };
-  
-  const copyPermanentToCommunication = () => {
-    setForm(p => ({ 
-      ...p, 
-      communicationAddress: p.permanentAddress
-    }));
-  };
-  
-  const valid = form.aadhaar && form.pan && form.name && form.permanentAddress && form.communicationAddress && form.company && form.refNumber;
-  const InfoChip = ({ icon, label, value }) => (
-    <div style={{ padding: "8px 12px", background: T.greenSoft, border: `1px solid ${T.green}25`, borderRadius: 8, marginTop: 6 }}>
-      <div style={{ fontSize: 10, color: T.green, fontFamily: T.font, fontWeight: 500, letterSpacing: ".04em", textTransform: "uppercase", marginBottom: 3 }}>{icon} {label}</div>
-      <div style={{ fontSize: 13, color: T.text, fontFamily: T.fontBody }}>{value}</div>
-    </div>
-  );
+  const extractName = () => { if (form.idNumber.length >= 4) { setExtracted(true); set("name", form.idType === "aadhaar" ? "Rajesh Kumar" : "Rajesh K"); } };
+  const valid = form.idNumber && form.name && form.address && form.company && form.refNumber;
   return (
     <PageShell onBack={onBack} step={2} totalSteps={6}>
       <Brand small />
-      <div style={{ display: "flex", gap: 12, marginBottom: 14 }}>
-        <Card style={{ flex: 1, padding: 18 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
-            <div style={{ width: 38, height: 38, borderRadius: 9, background: T.accentSoft, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>🪪</div>
-            <div>
-              <div style={{ fontFamily: T.font, fontWeight: 600, fontSize: 14, color: T.text }}>Aadhaar Card</div>
-              <div style={{ fontSize: 11, color: T.textDim }}>12-digit identity number</div>
-            </div>
-          </div>
-          <div style={{ display: "flex", gap: 8, alignItems: "flex-end" }}>
-            <div style={{ flex: 1 }}><Input label="Aadhaar Number" placeholder="XXXX XXXX XXXX" value={form.aadhaar} onChange={v => set("aadhaar", v)} required /></div>
-            <button onClick={extractAadhaar} style={{ padding: "10px 14px", marginBottom: 16, background: T.accentSoft, border: `1px solid ${T.accent}30`, borderRadius: 10, color: T.accent, fontFamily: T.font, fontWeight: 500, fontSize: 11, cursor: "pointer", whiteSpace: "nowrap" }}>Extract</button>
-          </div>
-          {aadhaarExtracted && (
-            <>
-              <InfoChip icon="👤" label="Name" value="Rajesh Kumar" />
-              <InfoChip icon="📍" label="Permanent Address" value="123, 4th Cross, JP Nagar, Bengaluru 560078" />
-            </>
-          )}
-        </Card>
-        <Card style={{ flex: 1, padding: 18 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
-            <div style={{ width: 38, height: 38, borderRadius: 9, background: T.purpleSoft, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18 }}>📄</div>
-            <div>
-              <div style={{ fontFamily: T.font, fontWeight: 600, fontSize: 14, color: T.text }}>PAN Card</div>
-              <div style={{ fontSize: 11, color: T.textDim }}>Permanent account number</div>
-            </div>
-          </div>
-          <Input label="PAN Number" placeholder="ABCDE1234F" value={form.pan} onChange={v => set("pan", v)} required />
-        </Card>
-      </div>
       <Card>
         <h2 style={{ fontFamily: T.font, fontWeight: 600, fontSize: 20, color: T.text, margin: "0 0 6px" }}>Personal Details</h2>
-        <p style={{ fontSize: 13, color: T.textMuted, margin: "0 0 22px" }}>Enter your contact & work details</p>
-        <Input label="Full Name" placeholder="Auto-extracted from ID" value={form.name} onChange={v => set("name", v)} required icon="👤" />
-        <Input label="Permanent Address" placeholder="Full residential address" value={form.permanentAddress} onChange={v => set("permanentAddress", v)} required icon="📍" />
-        <div style={{ display: "flex", gap: 8, alignItems: "flex-end" }}>
-          <div style={{ flex: 1 }}>
-            <Input label="Communication Address" placeholder="Full communication address" value={form.communicationAddress} onChange={v => set("communicationAddress", v)} required icon="📍" />
-          </div>
-          <button onClick={copyPermanentToCommunication} style={{ padding: "10px 14px", marginBottom: 16, background: T.accentSoft, border: `1px solid ${T.accent}30`, borderRadius: 10, color: T.accent, fontFamily: T.font, fontWeight: 500, fontSize: 11, cursor: "pointer", whiteSpace: "nowrap" }}>
-            Same as Permanent
-          </button>
+        <p style={{ fontSize: 13, color: T.textMuted, margin: "0 0 22px" }}>Enter your identification & contact details</p>
+        <div style={{ display: "flex", gap: 0, marginBottom: 16, background: T.inputBg, borderRadius: 10, border: `1px solid ${T.inputBorder}`, overflow: "hidden" }}>
+          {["aadhaar", "pan"].map(t => <button key={t} onClick={() => { set("idType", t); set("idNumber", ""); set("name", ""); setExtracted(false); }} style={{ flex: 1, padding: "10px 14px", background: form.idType === t ? T.accentSoft : "transparent", border: "none", color: form.idType === t ? T.accent : T.textMuted, fontFamily: T.font, fontWeight: 500, fontSize: 13, cursor: "pointer", transition: "all .25s", letterSpacing: ".02em", textTransform: "uppercase" }}>{t}</button>)}
         </div>
+        <div style={{ display: "flex", gap: 10, alignItems: "flex-end" }}>
+          <div style={{ flex: 1 }}><Input label={form.idType === "aadhaar" ? "Aadhaar Number" : "PAN Number"} placeholder={form.idType === "aadhaar" ? "XXXX XXXX XXXX" : "ABCDE1234F"} value={form.idNumber} onChange={v => set("idNumber", v)} required icon={form.idType === "aadhaar" ? "🪪" : "📄"} /></div>
+          <button onClick={extractName} style={{ padding: "11px 16px", marginBottom: 16, background: T.accentSoft, border: `1px solid ${T.accent}30`, borderRadius: 10, color: T.accent, fontFamily: T.font, fontWeight: 500, fontSize: 12, cursor: "pointer", whiteSpace: "nowrap" }}>Extract</button>
+        </div>
+        {extracted && <div style={{ padding: "9px 14px", background: T.greenSoft, border: `1px solid ${T.green}25`, borderRadius: 10, marginBottom: 16, display: "flex", alignItems: "center", gap: 8 }}><span style={{ fontSize: 14 }}>✓</span><span style={{ fontSize: 13, color: T.green }}>Name extracted</span></div>}
+        <Input label="Full Name" placeholder="Auto-extracted from ID" value={form.name} onChange={v => set("name", v)} required icon="👤" />
+        <Input label="Current Address" placeholder="Full residential address" value={form.address} onChange={v => set("address", v)} required icon="📍" />
         <Input label="Current Working Company" placeholder="Company name" value={form.company} onChange={v => set("company", v)} required icon="🏢" />
         <Input label="Reference Number" placeholder="Enter reference number" value={form.refNumber} onChange={v => set("refNumber", v)} required icon="🔗" />
         <Btn onClick={onDone} disabled={!valid} full style={{ marginTop: 6 }}>Submit & Continue</Btn>
@@ -507,10 +273,10 @@ const EAgreementPage = ({ onDone, onBack }) => {
   const [agreed, setAgreed] = useState(false);
   const scrollRef = useRef(null);
   const handleScroll = useCallback(() => { const el = scrollRef.current; if (el && (el.scrollTop + el.clientHeight >= el.scrollHeight - 20)) setScrolled(true); }, []);
-  const AGREEMENT_TXT = [
-      "E-AGREEMENT — NAVACHETANA LIVELIHOODS (EMPANEL)", "",
-      "This Empanel Agreement ('Agreement') is entered into between Navachetana Livelihoods Pvt. Ltd. ('Company') and the undersigned individual ('Empanel').", "",
-      "1. SCOPE OF ENGAGEMENT", "The Empanel shall act as an independent facilitator, assisting in identifying potential borrowers, collecting documentation, and facilitating loan applications within the assigned territory.", "",
+  const lines = [
+    "E-AGREEMENT — NAVACHETANA LIVELIHOODS", "",
+    "This Connector Agreement ('Agreement') is entered into between Navachetana Livelihoods Pvt. Ltd. ('Company') and the undersigned individual ('Connector').", "",
+    "1. SCOPE OF ENGAGEMENT", "The Connector shall act as an independent facilitator, assisting in identifying potential borrowers, collecting documentation, and facilitating loan applications within the assigned territory.", "",
     "2. RESPONSIBILITIES", "2.1 Comply with all applicable RBI guidelines and NBFC-MFI regulations.", "2.2 Conduct due diligence on prospective borrowers and verify documentation.", "2.3 All client information is confidential and proprietary to the Company.", "",
     "3. COMPENSATION", "3.1 Commission as per the prevailing rate card.", "3.2 Payments processed within 15 business days of loan disbursement.", "3.3 Disputes resolved through the Company's grievance mechanism.", "",
     "4. CODE OF CONDUCT", "4.1 No coercive recovery practices.", "4.2 Maintain transparency with borrowers regarding terms.", "4.3 No direct money collection from borrowers.", "",
@@ -589,12 +355,12 @@ const ConnectorStatusPage = ({ appData, onBack }) => (
             <span style={{ fontSize: 38 }}>🎉</span>
           </div>
           <h2 style={{ fontFamily: T.font, fontWeight: 700, fontSize: 24, color: T.text, margin: "0 0 8px" }}>You're Approved!</h2>
-          <p style={{ fontSize: 14, color: T.textMuted, margin: "0 0 24px" }}>Your empanel account has been activated</p>
+          <p style={{ fontSize: 14, color: T.textMuted, margin: "0 0 24px" }}>Your connector account has been activated</p>
           <Card style={{ textAlign: "left", marginBottom: 16 }}>
             <p style={{ fontSize: 11, fontWeight: 600, color: T.green, letterSpacing: ".08em", textTransform: "uppercase", margin: "0 0 14px", fontFamily: T.font }}>Your Login Credentials</p>
             <div style={{ padding: "14px", background: "rgba(0,0,0,.25)", borderRadius: 10, border: `1px solid ${T.cardBorder}`, marginBottom: 14 }}>
               <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 10 }}>
-                <span style={{ fontSize: 12, color: T.textMuted }}>Empanel ID</span>
+                <span style={{ fontSize: 12, color: T.textMuted }}>Connector ID</span>
                 <span style={{ fontSize: 14, fontWeight: 600, fontFamily: "monospace", color: T.accent }}>{appData.connectorId || appData.id}</span>
               </div>
               <div style={{ height: 1, background: T.cardBorder, margin: "0 0 10px" }} />
@@ -647,7 +413,7 @@ const ConnectorStatusPage = ({ appData, onBack }) => (
           </Card>
         </>
       )}
-      <p style={{ marginTop: 28, fontSize: 11, color: T.textDim }}>Navachetana Livelihoods · Empanel Onboarding</p>
+      <p style={{ marginTop: 28, fontSize: 11, color: T.textDim }}>Navachetana Livelihoods · Connector Onboarding</p>
     </div>
   </PageShell>
 );
@@ -683,31 +449,9 @@ const ConnectorLandingPage = ({ existingApp, onNewApp, onViewApp, onBack }) => {
       </div>
       <div onClick={onNewApp} onMouseEnter={() => setHov("new")} onMouseLeave={() => setHov(null)} style={{ padding: "20px", background: hov === "new" ? `linear-gradient(160deg,${T.green}10,transparent)` : T.card, border: `1.5px dashed ${hov === "new" ? T.green + "60" : T.cardBorder}`, borderRadius: 14, cursor: "pointer", transition: "all .35s", textAlign: "center", transform: hov === "new" ? "translateY(-2px)" : "none" }}>
         <div style={{ fontSize: 28, marginBottom: 8 }}>➕</div>
-        <div style={{ fontFamily: T.font, fontWeight: 600, fontSize: 15, color: hov === "new" ? T.text : "#c9d1d9" }}>Empanel</div>
-        <div style={{ fontSize: 12, color: T.textDim, marginTop: 4 }}>Begin a fresh empanelment</div>
+        <div style={{ fontFamily: T.font, fontWeight: 600, fontSize: 15, color: hov === "new" ? T.text : "#c9d1d9" }}>Start New Application</div>
+        <div style={{ fontSize: 12, color: T.textDim, marginTop: 4 }}>Begin a fresh connector onboarding</div>
       </div>
-    </PageShell>
-  );
-};
-
-// ─── EMPANEL LOGIN ───
-const RefPartnerLoginPage = ({ onDone, onBack }) => {
-  const [partnerId, setPartnerId] = useState("");
-  const [pass, setPass] = useState("");
-  const [loading, setLoading] = useState(false);
-  const handleLogin = () => { setLoading(true); setTimeout(onDone, 1400); };
-  return (
-    <PageShell onBack={onBack}>
-      <Brand small />
-      <Card>
-        <h2 style={{ fontFamily: T.font, fontWeight: 600, fontSize: 20, color: T.text, margin: "0 0 6px", textAlign: "center" }}>Empanel Login</h2>
-        <p style={{ fontSize: 13, color: T.textMuted, textAlign: "center", margin: "0 0 22px" }}>Sign in with your credentials</p>
-        <Input label="Empanel ID" placeholder="e.g. NC-CON-2026-48231" value={partnerId} onChange={setPartnerId} required icon="🔑" />
-        <Input label="Password" placeholder="Enter your password" value={pass} onChange={setPass} type="password" required icon="🔒" />
-        <Btn onClick={handleLogin} disabled={!partnerId || !pass || loading} full color={T.green}>
-          {loading ? "Signing in..." : "Login"}
-        </Btn>
-      </Card>
     </PageShell>
   );
 };
@@ -894,7 +638,7 @@ const OpsAppDetailPage = ({ app, onAction, onBack }) => {
       {app.status !== "pending" && (
         <Card style={{ marginTop: 6, background: app.status === "approved" ? T.greenSoft : "rgba(248,113,113,.04)", border: `1px solid ${app.status === "approved" ? T.green + "20" : T.danger + "15"}` }}>
           <p style={{ fontFamily: T.font, fontWeight: 600, fontSize: 13, color: app.status === "approved" ? T.green : T.amber, margin: "0 0 6px" }}>{app.status === "approved" ? "✓ Approved — Credentials generated & sent" : "↩ Sent back for corrections"}</p>
-          {app.status === "approved" && <p style={{ fontSize: 12, color: T.textMuted, margin: 0 }}>Empanel ID: <span style={{ fontFamily: "monospace", color: T.accent }}>{app.connectorId || app.id}</span></p>}
+          {app.status === "approved" && <p style={{ fontSize: 12, color: T.textMuted, margin: 0 }}>Connector ID: <span style={{ fontFamily: "monospace", color: T.accent }}>{app.connectorId || app.id}</span></p>}
           {app.status === "sent_back" && app.sendBackMsg && <p style={{ fontSize: 12, color: T.textMuted, margin: 0, lineHeight: 1.6 }}>Reason: {app.sendBackMsg}</p>}
         </Card>
       )}
@@ -902,26 +646,13 @@ const OpsAppDetailPage = ({ app, onAction, onBack }) => {
   );
 };
 
-// ─── Persist helpers ───
-const STORAGE_KEY = "navachetana_state";
-const loadState = () => { try { const s = localStorage.getItem(STORAGE_KEY); return s ? JSON.parse(s) : null; } catch { return null; } };
-const saveState = (s) => { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(s)); } catch {} };
-
 // ═══════════════════════ MAIN APP ═══════════════════════
 export default function App() {
-  const saved = useRef(loadState()).current;
-  const [page, setPageRaw] = useState(saved?.page || "login");
-  const [apps, setApps] = useState(saved?.apps || DUMMY_APPS);
-  const [selectedApp, setSelectedApp] = useState(saved?.selectedApp || null);
-  const [connectorApp, setConnectorApp] = useState(saved?.connectorApp || { ...PREV_CONNECTOR_APP });
-  const [hasExistingApp, setHasExistingApp] = useState(saved?.hasExistingApp ?? true);
-
-  const setPage = useCallback((p) => { setPageRaw(p); }, []);
-
-  // Save state on every change
-  useEffect(() => {
-    saveState({ page, apps, selectedApp, connectorApp, hasExistingApp });
-  }, [page, apps, selectedApp, connectorApp, hasExistingApp]);
+  const [page, setPage] = useState("login");
+  const [apps, setApps] = useState(DUMMY_APPS);
+  const [selectedApp, setSelectedApp] = useState(null);
+  const [connectorApp, setConnectorApp] = useState({ ...PREV_CONNECTOR_APP });
+  const [hasExistingApp, setHasExistingApp] = useState(true);
 
   const goHome = () => setPage("login");
 
@@ -938,13 +669,9 @@ export default function App() {
 
   switch (page) {
     case "login":
-      return <LoginPage onSelect={role => setPage(role === "login" ? "ref_login" : role === "connector" ? (hasExistingApp ? "con_landing" : "con_google") : "ops_choice")} />;
+      return <LoginPage onSelect={role => setPage(role === "connector" ? (hasExistingApp ? "con_landing" : "con_google") : "ops_choice")} />;
 
-    // ─── EMPANEL LOGIN ───
-    case "ref_login":
-      return <RefPartnerLoginPage onDone={() => setPage("con_landing")} onBack={goHome} />;
-
-    // ─── EMPANEL ───
+    // ─── CONNECTOR ───
     case "con_landing":
       return <ConnectorLandingPage existingApp={getConnectorApp()} onViewApp={() => setPage("con_status")} onNewApp={() => setPage("con_google")} onBack={goHome} />;
     case "con_status":
