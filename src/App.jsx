@@ -216,12 +216,22 @@ const MobileAuthPage = ({ onDone, onBack }) => {
 // ─── DATA ENTRY ───
 const DataEntryPage = ({ onDone, onBack }) => {
   const [form, setForm] = useState({ aadhaar: "", pan: "", name: "", address: "", company: "", refNumber: "" });
-  const [aadhaarExtracted, setAadhaarExtracted] = useState(false);
-  const [panExtracted, setPanExtracted] = useState(false);
+  const [aadhaarData, setAadhaarData] = useState(null);
+  const [panData, setPanData] = useState(null);
   const set = (k, v) => setForm(p => ({ ...p, [k]: v }));
-  const extractAadhaar = () => { if (form.aadhaar.length >= 4) { setAadhaarExtracted(true); set("name", "Rajesh Kumar"); } };
-  const extractPan = () => { if (form.pan.length >= 4) { setPanExtracted(true); if (!form.name) set("name", "Rajesh K"); } };
+  const extractAadhaar = () => { if (form.aadhaar.length >= 4) setAadhaarData({ name: "Rajesh Kumar", address: "123, 4th Cross, JP Nagar, Bengaluru 560078" }); };
+  const extractPan = () => { if (form.pan.length >= 4) setPanData({ name: "Rajesh K" }); };
   const valid = form.aadhaar && form.pan && form.name && form.address && form.company && form.refNumber;
+  const ClickChip = ({ icon, label, value, onClick }) => {
+    const [hov, setHov] = useState(false);
+    return (
+      <div onClick={onClick} onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)} style={{ padding: "8px 12px", background: hov ? T.accentSoft : "rgba(0,0,0,.2)", border: `1px solid ${hov ? T.accent + "40" : T.cardBorder}`, borderRadius: 8, cursor: "pointer", transition: "all .25s", marginTop: 6 }}>
+        <div style={{ fontSize: 10, color: T.textDim, fontFamily: T.font, fontWeight: 500, letterSpacing: ".04em", textTransform: "uppercase", marginBottom: 3 }}>{icon} {label}</div>
+        <div style={{ fontSize: 13, color: hov ? T.accent : T.text, fontFamily: T.fontBody, transition: "color .25s" }}>{value}</div>
+        <div style={{ fontSize: 10, color: hov ? T.accent : T.textDim, marginTop: 3, fontFamily: T.font, transition: "color .25s" }}>Tap to fill →</div>
+      </div>
+    );
+  };
   return (
     <PageShell onBack={onBack} step={2} totalSteps={6}>
       <Brand small />
@@ -238,7 +248,12 @@ const DataEntryPage = ({ onDone, onBack }) => {
             <div style={{ flex: 1 }}><Input label="Aadhaar Number" placeholder="XXXX XXXX XXXX" value={form.aadhaar} onChange={v => set("aadhaar", v)} required /></div>
             <button onClick={extractAadhaar} style={{ padding: "10px 14px", marginBottom: 16, background: T.accentSoft, border: `1px solid ${T.accent}30`, borderRadius: 10, color: T.accent, fontFamily: T.font, fontWeight: 500, fontSize: 11, cursor: "pointer", whiteSpace: "nowrap" }}>Extract</button>
           </div>
-          {aadhaarExtracted && <div style={{ padding: "8px 12px", background: T.greenSoft, border: `1px solid ${T.green}25`, borderRadius: 8, display: "flex", alignItems: "center", gap: 6 }}><span style={{ fontSize: 12 }}>✓</span><span style={{ fontSize: 11, color: T.green }}>Verified</span></div>}
+          {aadhaarData && (
+            <>
+              <ClickChip icon="👤" label="Name" value={aadhaarData.name} onClick={() => set("name", aadhaarData.name)} />
+              <ClickChip icon="📍" label="Address" value={aadhaarData.address} onClick={() => set("address", aadhaarData.address)} />
+            </>
+          )}
         </Card>
         <Card style={{ flex: 1, padding: 18 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
@@ -252,7 +267,9 @@ const DataEntryPage = ({ onDone, onBack }) => {
             <div style={{ flex: 1 }}><Input label="PAN Number" placeholder="ABCDE1234F" value={form.pan} onChange={v => set("pan", v)} required /></div>
             <button onClick={extractPan} style={{ padding: "10px 14px", marginBottom: 16, background: T.purpleSoft, border: `1px solid ${T.purple}30`, borderRadius: 10, color: T.purple, fontFamily: T.font, fontWeight: 500, fontSize: 11, cursor: "pointer", whiteSpace: "nowrap" }}>Extract</button>
           </div>
-          {panExtracted && <div style={{ padding: "8px 12px", background: T.greenSoft, border: `1px solid ${T.green}25`, borderRadius: 8, display: "flex", alignItems: "center", gap: 6 }}><span style={{ fontSize: 12 }}>✓</span><span style={{ fontSize: 11, color: T.green }}>Verified</span></div>}
+          {panData && (
+            <ClickChip icon="👤" label="Name" value={panData.name} onClick={() => set("name", panData.name)} />
+          )}
         </Card>
       </div>
       <Card>
