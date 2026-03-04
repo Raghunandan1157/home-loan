@@ -107,36 +107,163 @@ const StatusBadge = ({ status }) => {
   return <span style={{ display: "inline-flex", alignItems: "center", gap: 5, padding: "4px 12px", borderRadius: 20, background: m.bg, border: `1px solid ${m.border}`, fontSize: 11, fontWeight: 600, fontFamily: T.font, color: m.color, letterSpacing: ".03em" }}>● {m.label}</span>;
 };
 
-// ─── LOGIN ───
+// ─── LOGIN (Website-style with nav) ───
 const LoginPage = ({ onSelect }) => {
-  const [hov, setHov] = useState(null);
-  const RoleCard = ({ id, icon, title, sub, color }) => (
-    <button onClick={() => onSelect(id)} onMouseEnter={() => setHov(id)} onMouseLeave={() => setHov(null)} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 14, padding: "34px 18px", background: hov === id ? `linear-gradient(160deg,${color}15,${color}06,transparent)` : T.card, border: `1px solid ${hov === id ? color + "55" : T.cardBorder}`, borderRadius: 16, cursor: "pointer", transition: "all .4s cubic-bezier(.16,1,.3,1)", transform: hov === id ? "translateY(-4px)" : "none", boxShadow: hov === id ? `0 20px 50px -12px ${color}28` : "0 4px 16px rgba(0,0,0,.2)", position: "relative", overflow: "hidden" }}>
-      {hov === id && <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 2, background: `linear-gradient(90deg,transparent,${color},transparent)`, animation: "shimmer 1.5s ease-in-out infinite" }} />}
-      <div style={{ width: 56, height: 56, borderRadius: 13, display: "flex", alignItems: "center", justifyContent: "center", background: `linear-gradient(135deg,${color}20,${color}08)`, border: `1px solid ${color}30`, fontSize: 26, transition: "transform .3s", transform: hov === id ? "scale(1.08)" : "scale(1)" }}>{icon}</div>
-      <div style={{ textAlign: "center" }}>
-        <div style={{ fontFamily: T.font, fontWeight: 600, fontSize: 17, color: hov === id ? T.text : "#c9d1d9", transition: "color .3s" }}>{title}</div>
-        <div style={{ fontFamily: T.fontBody, fontSize: 12, color: T.textDim, marginTop: 4 }}>{sub}</div>
-      </div>
-      <div style={{ fontSize: 11, fontWeight: 500, color: hov === id ? color : T.textDim, letterSpacing: ".06em", textTransform: "uppercase", transition: "all .3s", display: "flex", alignItems: "center", gap: 4 }}>Continue <span style={{ display: "inline-block", transform: hov === id ? "translateX(4px)" : "none", transition: "transform .3s" }}>→</span></div>
-    </button>
-  );
+  const [dropOpen, setDropOpen] = useState(false);
+  const [modal, setModal] = useState(null); // null | "choose" | "referral" | "ops"
+  const [loginId, setLoginId] = useState("");
+  const [loginPass, setLoginPass] = useState("");
+  const [loginLoading, setLoginLoading] = useState(false);
+  const dropRef = useRef(null);
+
+  useEffect(() => {
+    const handler = (e) => { if (dropRef.current && !dropRef.current.contains(e.target)) setDropOpen(false); };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  const handleLogin = (e) => {
+    e.preventDefault();
+    if (!loginId || !loginPass) return;
+    setLoginLoading(true);
+    setTimeout(() => {
+      setLoginLoading(false);
+      setModal(null);
+      setLoginId(""); setLoginPass("");
+      onSelect("login");
+    }, 1200);
+  };
+
+  const openRole = (role) => { setModal(role); setLoginId(""); setLoginPass(""); setLoginLoading(false); };
+
+  const navS = { position:"fixed",top:0,left:0,right:0,height:70,background:"rgba(255,255,255,0.97)",backdropFilter:"blur(10px)",zIndex:100,boxShadow:"0 1px 3px rgba(0,0,0,.08)",display:"flex",alignItems:"center",padding:"0 32px",fontFamily:"'Inter','Outfit',sans-serif" };
+  const linkS = { fontSize:14,fontWeight:500,color:"#475569",cursor:"pointer",padding:"8px 0",position:"relative",transition:"color .2s",background:"none",border:"none",fontFamily:"inherit" };
+  const linkActiveS = { ...linkS, color:"#0d9488" };
+
   return (
-    <PageShell>
-      <Brand />
-      <p style={{ textAlign: "center", fontSize: 14, color: T.textDim, marginBottom: 30 }}>Select your role to continue</p>
-      <div style={{ display: "flex", gap: 14 }}>
-        <RoleCard id="connector" icon="⚡" title="Referral Partner" sub="Field ops & client connections" color={T.accent} />
-        <RoleCard id="ops" icon="📊" title="Ops Manager" sub="Reports & analytics" color={T.purple} />
+    <div style={{ minHeight:"100vh",background:"#fff",fontFamily:"'Inter','Outfit',sans-serif" }}>
+      <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+      {/* Navbar */}
+      <nav style={navS}>
+        <div style={{ display:"flex",alignItems:"center",gap:10,marginRight:"auto" }}>
+          <div style={{ width:40,height:40,borderRadius:10,background:"linear-gradient(135deg,#0d9488,#84cc16)",display:"flex",alignItems:"center",justifyContent:"center" }}>
+            <span style={{ color:"#fff",fontWeight:700,fontSize:18 }}>N</span>
+          </div>
+          <div style={{ lineHeight:1.15 }}>
+            <div style={{ fontSize:16,fontWeight:700,color:"#0d9488" }}>Navachetana</div>
+            <div style={{ fontSize:12,fontWeight:600,color:"#84cc16" }}>Livelihoods</div>
+          </div>
+        </div>
+        <div style={{ display:"flex",alignItems:"center",gap:28 }}>
+          <span style={linkActiveS}>Home</span>
+          <span style={linkS}>About</span>
+          <span style={linkS}>Services</span>
+          <span style={linkS}>How It Works</span>
+          {/* Referral Partner Dropdown */}
+          <div ref={dropRef} style={{ position:"relative" }}>
+            <button onClick={() => setDropOpen(!dropOpen)} style={{ ...linkS, display:"flex",alignItems:"center",gap:4 }}>
+              Referral Partner <span style={{ fontSize:10,transition:"transform .2s",transform:dropOpen?"rotate(180deg)":"none" }}>▾</span>
+            </button>
+            {dropOpen && (
+              <div style={{ position:"absolute",top:"calc(100% + 8px)",right:0,background:"#fff",borderRadius:12,boxShadow:"0 20px 40px -8px rgba(0,0,0,.15)",border:"1px solid #e2e8f0",minWidth:210,padding:6,zIndex:101,animation:"fadeUp .2s ease-out" }}>
+                <button onClick={() => { setDropOpen(false); openRole("referral"); }} style={{ display:"flex",alignItems:"center",gap:10,width:"100%",padding:"10px 14px",border:"none",background:"transparent",borderRadius:8,cursor:"pointer",textAlign:"left",transition:"background .15s",fontFamily:"inherit" }} onMouseEnter={e=>e.currentTarget.style.background="#f0fdfa"} onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
+                  <span style={{ fontSize:16 }}>⚡</span>
+                  <span style={{ fontSize:14,fontWeight:500,color:"#1e293b" }}>Referral Partner</span>
+                </button>
+                <button onClick={() => { setDropOpen(false); setModal("choose"); }} style={{ display:"flex",alignItems:"center",gap:10,width:"100%",padding:"10px 14px",border:"none",background:"transparent",borderRadius:8,cursor:"pointer",textAlign:"left",transition:"background .15s",fontFamily:"inherit" }} onMouseEnter={e=>e.currentTarget.style.background="#f0fdfa"} onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
+                  <span style={{ fontSize:16 }}>🔐</span>
+                  <span style={{ fontSize:14,fontWeight:500,color:"#1e293b" }}>Login</span>
+                </button>
+              </div>
+            )}
+          </div>
+          <button onClick={() => onSelect("connector")} style={{ padding:"10px 22px",background:"#0d9488",color:"#fff",border:"none",borderRadius:8,fontWeight:600,fontSize:14,cursor:"pointer",fontFamily:"inherit",transition:"all .2s" }} onMouseEnter={e=>e.currentTarget.style.background="#0f766e"} onMouseLeave={e=>e.currentTarget.style.background="#0d9488"}>
+            Contact Us
+          </button>
+        </div>
+      </nav>
+
+      {/* Hero */}
+      <div style={{ paddingTop:70,minHeight:"100vh",display:"flex",alignItems:"center",background:"linear-gradient(135deg,#f0fdfa 0%,#fff 50%,#ecfdf5 100%)" }}>
+        <div style={{ maxWidth:1200,margin:"0 auto",padding:"60px 32px",display:"flex",alignItems:"center",gap:60 }}>
+          <div style={{ flex:1 }}>
+            <h1 style={{ fontSize:48,fontWeight:700,color:"#1e293b",lineHeight:1.15,marginBottom:20 }}>
+              Welcome to <span style={{ color:"#0d9488" }}>Navachetana Livelihoods</span>
+            </h1>
+            <p style={{ fontSize:18,color:"#475569",lineHeight:1.7,marginBottom:32,maxWidth:520 }}>
+              Empowering growth through microfinance. Accessible financial solutions for rural communities, women entrepreneurs, and small businesses across India.
+            </p>
+            <div style={{ display:"flex",gap:14 }}>
+              <button onClick={() => onSelect("connector")} style={{ padding:"14px 32px",background:"#0d9488",color:"#fff",border:"2px solid #0d9488",borderRadius:10,fontWeight:600,fontSize:16,cursor:"pointer",fontFamily:"inherit",transition:"all .25s" }} onMouseEnter={e=>{e.currentTarget.style.background="#0f766e";e.currentTarget.style.borderColor="#0f766e"}} onMouseLeave={e=>{e.currentTarget.style.background="#0d9488";e.currentTarget.style.borderColor="#0d9488"}}>
+                Get Started
+              </button>
+              <button onClick={() => setModal("choose")} style={{ padding:"14px 32px",background:"transparent",color:"#0d9488",border:"2px solid #0d9488",borderRadius:10,fontWeight:600,fontSize:16,cursor:"pointer",fontFamily:"inherit",transition:"all .25s" }} onMouseEnter={e=>e.currentTarget.style.background="#f0fdfa"} onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
+                Partner Login
+              </button>
+            </div>
+            <div style={{ display:"flex",gap:40,marginTop:48 }}>
+              {[["10,000+","Borrowers"],["500+","Partners"],["₹50Cr+","Disbursed"]].map(([n,l])=>(
+                <div key={l}><div style={{ fontSize:28,fontWeight:700,color:"#0d9488" }}>{n}</div><div style={{ fontSize:13,color:"#94a3b8",marginTop:2 }}>{l}</div></div>
+              ))}
+            </div>
+          </div>
+          <div style={{ flex:1,display:"flex",justifyContent:"center" }}>
+            <div style={{ width:360,height:360,borderRadius:"50%",background:"linear-gradient(135deg,#0d948830,#84cc1620)",display:"flex",alignItems:"center",justifyContent:"center",boxShadow:"0 40px 80px -20px rgba(13,148,136,.2)" }}>
+              <div style={{ width:280,height:280,borderRadius:"50%",background:"linear-gradient(135deg,#0d948815,#84cc1610)",display:"flex",alignItems:"center",justifyContent:"center" }}>
+                <span style={{ fontSize:80 }}>🏦</span>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-      <div style={{ display: "flex", alignItems: "center", gap: 14, margin: "24px 0" }}>
-        <div style={{ flex: 1, height: 1, background: T.cardBorder }} />
-        <span style={{ fontSize: 11, color: T.textDim, fontFamily: T.font, letterSpacing: ".06em" }}>OR</span>
-        <div style={{ flex: 1, height: 1, background: T.cardBorder }} />
-      </div>
-      <RoleCard id="login" icon="🔐" title="Login" sub="Already a referral partner? Sign in here" color={T.green} />
-      <p style={{ textAlign: "center", marginTop: 36, fontSize: 11, color: T.textDim }}>Navachetana Livelihoods · Internal Portal</p>
-    </PageShell>
+
+      {/* Login Modal */}
+      {modal && (
+        <div onClick={(e) => { if (e.target === e.currentTarget) { setModal(null); setLoginId(""); setLoginPass(""); } }} style={{ position:"fixed",inset:0,background:"rgba(15,23,42,0.5)",backdropFilter:"blur(8px)",zIndex:200,display:"flex",alignItems:"center",justifyContent:"center",animation:"fadeUp .2s ease-out" }}>
+          <div style={{ background:"#fff",borderRadius:16,padding:"36px",width:"90%",maxWidth:420,boxShadow:"0 25px 60px -12px rgba(0,0,0,.25)",position:"relative" }}>
+            <button onClick={() => { setModal(null); setLoginId(""); setLoginPass(""); }} style={{ position:"absolute",top:14,right:18,background:"none",border:"none",fontSize:24,color:"#94a3b8",cursor:"pointer" }}>×</button>
+
+            {modal === "choose" ? (
+              <>
+                <div style={{ textAlign:"center",fontSize:36,marginBottom:10 }}>🔐</div>
+                <h2 style={{ textAlign:"center",fontSize:22,fontWeight:700,color:"#1e293b",marginBottom:4 }}>Login</h2>
+                <p style={{ textAlign:"center",fontSize:14,color:"#94a3b8",marginBottom:24 }}>Select your role to continue</p>
+                <div style={{ display:"flex",flexDirection:"column",gap:10 }}>
+                  {[["referral","⚡","Referral Partner","Field ops & client connections"],["ops","📊","Operational Manager","Reports & analytics"]].map(([id,ic,nm,desc])=>(
+                    <button key={id} onClick={() => openRole(id)} style={{ display:"flex",alignItems:"center",gap:14,padding:"16px 18px",background:"#f0fdfa",border:"2px solid transparent",borderRadius:12,cursor:"pointer",textAlign:"left",transition:"all .25s",fontFamily:"inherit" }} onMouseEnter={e=>{e.currentTarget.style.borderColor="#0d9488";e.currentTarget.style.background="#fff";e.currentTarget.style.boxShadow="0 4px 12px rgba(0,0,0,.08)"}} onMouseLeave={e=>{e.currentTarget.style.borderColor="transparent";e.currentTarget.style.background="#f0fdfa";e.currentTarget.style.boxShadow="none"}}>
+                      <div style={{ width:44,height:44,borderRadius:10,background:"#fff",boxShadow:"0 1px 3px rgba(0,0,0,.08)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:20,flexShrink:0 }}>{ic}</div>
+                      <div><div style={{ fontWeight:600,fontSize:15,color:"#1e293b" }}>{nm}</div><div style={{ fontSize:12,color:"#94a3b8",marginTop:2 }}>{desc}</div></div>
+                    </button>
+                  ))}
+                </div>
+              </>
+            ) : (
+              <>
+                <button onClick={() => setModal("choose")} style={{ background:"none",border:"none",color:"#94a3b8",fontSize:14,fontWeight:500,cursor:"pointer",marginBottom:14,padding:0,fontFamily:"inherit" }}>← Back</button>
+                <div style={{ textAlign:"center",fontSize:36,marginBottom:10 }}>{modal === "referral" ? "⚡" : "📊"}</div>
+                <h2 style={{ textAlign:"center",fontSize:22,fontWeight:700,color:"#1e293b",marginBottom:4 }}>{modal === "referral" ? "Referral Partner Login" : "Operational Manager Login"}</h2>
+                <p style={{ textAlign:"center",fontSize:14,color:"#94a3b8",marginBottom:24 }}>Enter your credentials to sign in</p>
+                <form onSubmit={handleLogin}>
+                  <div style={{ marginBottom:14 }}>
+                    <label style={{ display:"block",fontSize:12,fontWeight:600,color:"#475569",textTransform:"uppercase",letterSpacing:".04em",marginBottom:6 }}>ID</label>
+                    <input value={loginId} onChange={e=>setLoginId(e.target.value)} placeholder={modal === "referral" ? "e.g. NC-CON-2026-48231" : "e.g. NV-OPS-001"} required style={{ width:"100%",padding:"12px 14px",border:"1.5px solid #e2e8f0",borderRadius:8,fontSize:15,fontFamily:"inherit",color:"#1e293b",background:"#f0fdfa",transition:"all .25s",boxSizing:"border-box" }} onFocus={e=>{e.target.style.borderColor="#0d9488";e.target.style.boxShadow="0 0 0 3px rgba(13,148,136,.1)";e.target.style.background="#fff"}} onBlur={e=>{e.target.style.borderColor="#e2e8f0";e.target.style.boxShadow="none";e.target.style.background="#f0fdfa"}} />
+                  </div>
+                  <div style={{ marginBottom:20 }}>
+                    <label style={{ display:"block",fontSize:12,fontWeight:600,color:"#475569",textTransform:"uppercase",letterSpacing:".04em",marginBottom:6 }}>Password</label>
+                    <input type="password" value={loginPass} onChange={e=>setLoginPass(e.target.value)} placeholder="Enter your password" required style={{ width:"100%",padding:"12px 14px",border:"1.5px solid #e2e8f0",borderRadius:8,fontSize:15,fontFamily:"inherit",color:"#1e293b",background:"#f0fdfa",transition:"all .25s",boxSizing:"border-box" }} onFocus={e=>{e.target.style.borderColor="#0d9488";e.target.style.boxShadow="0 0 0 3px rgba(13,148,136,.1)";e.target.style.background="#fff"}} onBlur={e=>{e.target.style.borderColor="#e2e8f0";e.target.style.boxShadow="none";e.target.style.background="#f0fdfa"}} />
+                  </div>
+                  <button type="submit" disabled={!loginId||!loginPass||loginLoading} style={{ width:"100%",padding:"13px",background:loginLoading?"#10b981":"#0d9488",color:"#fff",border:"none",borderRadius:10,fontWeight:600,fontSize:15,cursor:loginLoading?"wait":"pointer",fontFamily:"inherit",transition:"all .25s",opacity:(!loginId||!loginPass)?0.5:1 }}>
+                    {loginLoading ? "Signing in..." : "Login"}
+                  </button>
+                </form>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+
+      <p style={{ textAlign:"center",padding:"40px 0",fontSize:13,color:"#94a3b8" }}>© 2026 Navachetana Livelihoods Pvt. Ltd. All rights reserved.</p>
+    </div>
   );
 };
 
