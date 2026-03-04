@@ -537,6 +537,28 @@ const ConnectorLandingPage = ({ existingApp, onNewApp, onViewApp, onBack }) => {
   );
 };
 
+// ─── REFERRAL PARTNER LOGIN ───
+const RefPartnerLoginPage = ({ onDone, onBack }) => {
+  const [partnerId, setPartnerId] = useState("");
+  const [pass, setPass] = useState("");
+  const [loading, setLoading] = useState(false);
+  const handleLogin = () => { setLoading(true); setTimeout(onDone, 1400); };
+  return (
+    <PageShell onBack={onBack}>
+      <Brand small />
+      <Card>
+        <h2 style={{ fontFamily: T.font, fontWeight: 600, fontSize: 20, color: T.text, margin: "0 0 6px", textAlign: "center" }}>Referral Partner Login</h2>
+        <p style={{ fontSize: 13, color: T.textMuted, textAlign: "center", margin: "0 0 22px" }}>Sign in with your credentials</p>
+        <Input label="Referral Partner ID" placeholder="e.g. NC-CON-2026-48231" value={partnerId} onChange={setPartnerId} required icon="🔑" />
+        <Input label="Password" placeholder="Enter your password" value={pass} onChange={setPass} type="password" required icon="🔒" />
+        <Btn onClick={handleLogin} disabled={!partnerId || !pass || loading} full color={T.green}>
+          {loading ? "Signing in..." : "Login"}
+        </Btn>
+      </Card>
+    </PageShell>
+  );
+};
+
 // ─── OPS: LOGIN CHOICE ───
 const OpsLoginChoicePage = ({ onGoogle, onEmployee, onBack }) => {
   const [hov, setHov] = useState(null);
@@ -763,9 +785,13 @@ export default function App() {
 
   switch (page) {
     case "login":
-      return <LoginPage onSelect={role => setPage(role === "login" ? "con_google" : role === "connector" ? (hasExistingApp ? "con_landing" : "con_google") : "ops_choice")} />;
+      return <LoginPage onSelect={role => setPage(role === "login" ? "ref_login" : role === "connector" ? (hasExistingApp ? "con_landing" : "con_google") : "ops_choice")} />;
 
-    // ─── CONNECTOR ───
+    // ─── REFERRAL PARTNER LOGIN ───
+    case "ref_login":
+      return <RefPartnerLoginPage onDone={() => setPage("con_landing")} onBack={goHome} />;
+
+    // ─── REFERRAL PARTNER ───
     case "con_landing":
       return <ConnectorLandingPage existingApp={getConnectorApp()} onViewApp={() => setPage("con_status")} onNewApp={() => setPage("con_google")} onBack={goHome} />;
     case "con_status":
